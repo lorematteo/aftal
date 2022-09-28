@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,33 +13,57 @@ const tab = createBottomTabNavigator();
 export default function MainScreen() {
   return (
     <NavigationContainer>
-      <tab.Navigator
-        screenOptions={({route}) => ({
-          tabBarIcon: ({focused, color, size}) => {
-            let iconName;
-            if ( route.name == "Accueil"){
-              iconName = focused ? "home" : "home-outline"
-            } else if ( route.name == "Découvrir" ){
-              iconName = focused ? "compass" : "compass-outline"
-            } else if ( route.name == "Chat" ){
-              iconName = focused ? "chatbubbles" : "chatbubbles-outline"
-            } else if ( route.name == "Profil" ){
-              iconName = focused ? "person" : "person-outline"
-            }
-
-            return <Ionicons name={iconName} size={15} color={"black"}/>
-          }
-        })}
-      >
-        <tab.Screen name="Accueil" component={HomeScreen}/>
-        <tab.Screen name="Découvrir" component={DiscoverScreen} />
-        <tab.Screen name="Chat" component={ChatScreen} />
-        <tab.Screen name="Profil" component={ProfilScreen} />
-      </tab.Navigator> 
+      <tab.Navigator>
+        <tab.Screen name="Accueil" component={HomeScreen} options={{
+          tabBarLabel: ({focused, color, size}) => (
+            <Text style={focused ? styles.tabBarTextSelected : styles.tabBarText}>Accueil</Text>
+          ),
+          tabBarIcon: ({focused, color, size}) => (
+            <Ionicons name="home" size={20} style={focused ? styles.tabBarImageSelected : styles.tabBarImage}/>
+          ),
+        }}/>
+        <tab.Screen name="Découvrir" component={DiscoverScreen} options={{
+          tabBarLabel: ({focused, color, size}) => (
+            <Text style={focused ? styles.tabBarTextSelected : styles.tabBarText}>Découvrir</Text>
+          ),
+          tabBarIcon: ({focused, color, size}) => (
+            <Ionicons name="compass" size={20} style={focused ? styles.tabBarImageSelected : styles.tabBarImage}/>
+          ),
+        }}/>
+        <tab.Screen name="Chat" component={ChatScreen} options={{
+          tabBarLabel: ({focused, color, size}) => (
+            <Text style={focused ? styles.tabBarTextSelected : styles.tabBarText}>Chat</Text>
+          ),
+          tabBarIcon: ({focused, color, size}) => (
+            <Ionicons name="chatbubbles" size={20} style={focused ? styles.tabBarImageSelected : styles.tabBarImage}/>
+          ),
+        }}/>
+        <tab.Screen name="Profil" component={ProfilScreen} options={{
+          tabBarLabel: ({focused, color, size}) => (
+            <Text style={focused ? styles.tabBarTextSelected : styles.tabBarText}>Profil</Text>
+          ),
+          tabBarIcon: ({focused, color, size}) => (
+            <Ionicons name="person" size={20} style={focused ? styles.tabBarImageSelected : styles.tabBarImage}/>
+          ),
+        }}/>
+      </tab.Navigator>
     </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
-
+  tabBarText: {
+    color: "grey",
+    size: 10
+  },
+  tabBarTextSelected: {
+    color: "black",
+    size: 10
+  },
+  tabBarImage: {
+    color: "grey",
+  },
+  tabBarImageSelected: {
+    color: "black",
+  }
 });
