@@ -13,7 +13,11 @@ const tab = createBottomTabNavigator();
 export default function MainScreen() {
   return (
     <NavigationContainer>
-      <tab.Navigator>
+      <tab.Navigator screenOptions={{
+        tabBarShowLabel: false,
+        tabBarHideOnKeyboard: true,
+        }}>
+
         <tab.Screen name="Accueil" component={HomeScreen} options={{
           tabBarLabel: ({focused, color, size}) => (
             <Text style={focused ? styles.tabBarTextSelected : styles.tabBarText}>Accueil</Text>
@@ -21,6 +25,7 @@ export default function MainScreen() {
           tabBarIcon: ({focused, color, size}) => (
             <Ionicons name="home" size={20} style={focused ? styles.tabBarImageSelected : styles.tabBarImage}/>
           ),
+          headerShown: false,
         }}/>
         <tab.Screen name="Découvrir" component={DiscoverScreen} options={{
           tabBarLabel: ({focused, color, size}) => (
