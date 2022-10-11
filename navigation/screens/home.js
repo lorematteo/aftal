@@ -1,10 +1,17 @@
-import { StyleSheet, Text, View, ImageBackground, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Animated, Image, PanResponder } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
 
-const phoneWidth = Dimensions.get('window').width;
-const phoneHeight = Dimensions.get('window').height;
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const image = { uri: "https://api.nawak.me/render/630553/w600" };
+const profiles = [
+  { id: "1", uri: require('../../assets/1.jpeg') },
+  { id: "2", uri: require('../../assets/3.jpeg') },
+  { id: "4", uri: require('../../assets/4.jpeg') },
+  { id: "5", uri: require('../../assets/5.jpeg') },
+]
 
 export default function HomeScreen(){
     return (
@@ -14,21 +21,53 @@ export default function HomeScreen(){
             <Text>Aftal</Text>
             <Ionicons name="settings" size={25}/>
           </View>
-          <View style={styles.matchContainer}>
-            <View style={styles.matchCard}>
-            <ImageBackground source={image} resizeMode="cover" style={styles.image}>
-            </ImageBackground>
-            </View>
-          </View>
+          <SwipeCards />
         </View>
     );
+}
+
+class SwipeCards extends React.Component {
+
+  constructor() {
+    super();
+    this.position = new Animated.ValueXY();
+  };
+
+  componentWillMount() {
+    this.PanResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onPanResponderMove: (evt, gestureState) => {
+         this.position.setValue({ x: gestureState.dx, y: gestureState.dy });
+    },
+      onPanResponderRelease: (evt, gestureState) => {
+      }
+    })
+  };
+
+  render() {
+    return (
+      <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
+          {
+            profiles.map((item, i) => {
+              return (
+                <Animated.View key={i} style={styles.matchCard}>
+                  <Image style={styles.image} source={item.uri}/>
+                </Animated.View>
+              );
+            })
+          }
+        </View>
+      </View>
+    );
+  };
+
 }
 
 const styles = StyleSheet.create({
     appContainer: {
       backgroundColor: "white",
-      paddingHorizontal: phoneWidth*0.01,
-      paddingTop: phoneHeight*0.05,
+      paddingTop: SCREEN_HEIGHT*0.05,
       flex: 1,
     },
     topBar : {
@@ -36,7 +75,8 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       alignContent: "center",
       justifyContent: "space-between",
-      paddingHorizontal: phoneWidth*0.05,
+      paddingHorizontal: SCREEN_WIDTH*0.05,
+      height: SCREEN_HEIGHT*0.06,
     },
     matchContainer: {
       backgroundColor: "white",
@@ -45,12 +85,16 @@ const styles = StyleSheet.create({
     },
     matchCard: {
       flex: 1,
+      height: SCREEN_HEIGHT*0.8,
+      width: SCREEN_WIDTH,
+      position: "absolute",
+      padding: 10,
     },
     image: {
       flex: 1,
-      justifyContent: "center",
-      margin: 10,
       borderRadius: 25,
-      overflow: 'hidden'
+      height: null,
+      width: null,
+      resizeMode: "cover",
     },
   });
