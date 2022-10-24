@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "Aftal",
+    "owner": "aftalteam",
     "slug": "Aftal",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -28,6 +29,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "92b545b5-fdcf-4ed2-85c2-7f5cbf04169b"
+      }
     }
   }
 }
