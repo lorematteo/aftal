@@ -1,18 +1,12 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-  Animated,
-  Image,
-  PanResponder,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, View, Animated, Image, PanResponder, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height;
+
+import MatchCardShape from './matchCardShape';
+
 
 const profiles = [
   { id: "1", uri: require("../../assets/1.jpeg") },
@@ -20,42 +14,26 @@ const profiles = [
   { id: "3", uri: require("../../assets/3.jpeg") },
   { id: "4", uri: require("../../assets/4.jpeg") },
   { id: "5", uri: require("../../assets/5.jpeg") },
-  { id: "1", uri: require("../../assets/1.jpeg") },
-  { id: "2", uri: require("../../assets/2.jpeg") },
-  { id: "3", uri: require("../../assets/3.jpeg") },
-  { id: "4", uri: require("../../assets/4.jpeg") },
-  { id: "5", uri: require("../../assets/5.jpeg") },
-  { id: "1", uri: require("../../assets/1.jpeg") },
-  { id: "2", uri: require("../../assets/2.jpeg") },
-  { id: "3", uri: require("../../assets/3.jpeg") },
-  { id: "4", uri: require("../../assets/4.jpeg") },
-  { id: "5", uri: require("../../assets/5.jpeg") },
-  { id: "1", uri: require("../../assets/1.jpeg") },
-  { id: "2", uri: require("../../assets/2.jpeg") },
-  { id: "3", uri: require("../../assets/3.jpeg") },
-  { id: "4", uri: require("../../assets/4.jpeg") },
-  { id: "5", uri: require("../../assets/5.jpeg") },
-  { id: "1", uri: require("../../assets/1.jpeg") },
-  { id: "2", uri: require("../../assets/2.jpeg") },
-  { id: "3", uri: require("../../assets/3.jpeg") },
-  { id: "4", uri: require("../../assets/4.jpeg") },
-  { id: "5", uri: require("../../assets/5.jpeg") },
-  { id: "1", uri: require("../../assets/1.jpeg") },
-  { id: "2", uri: require("../../assets/2.jpeg") },
-  { id: "3", uri: require("../../assets/3.jpeg") },
-  { id: "4", uri: require("../../assets/4.jpeg") },
-  { id: "5", uri: require("../../assets/5.jpeg") },
+  { id: "6", uri: require("../../assets/1.jpeg") },
+  { id: "7", uri: require("../../assets/2.jpeg") },
+  { id: "8", uri: require("../../assets/3.jpeg") },
+  { id: "9", uri: require("../../assets/4.jpeg") },
+  { id: "10", uri: require("../../assets/5.jpeg") },
 ];
+
+
 
 export default function HomeScreen() {
   return (
-    <View style={styles.appContainer}>
-      <View style={styles.topBar}>
-        <Ionicons name="person-circle" size={25} />
-        <Text>Aftal</Text>
-        <Ionicons name="notifications" size={25} />
+    <View style={styles.viewContainer}>
+      <TopBar />
+      <View>
+        <View style={styles.matchCard}>
+          <SwipeCards/>
+        </View>
+        <MusicPlayer/>
+        <ButtonBar/>
       </View>
-      <SwipeCards />
     </View>
   );
 }
@@ -114,6 +92,7 @@ class SwipeCards extends React.Component {
         this.position.setValue({ x: gestureState.dx, y: gestureState.dy });
       },
       onPanResponderRelease: (evt, gestureState) => {
+        // RIGHT
         if (gestureState.dx > 120) {
           Animated.timing(this.position, {
             toValue: { x: SCREEN_WIDTH + 100, y: gestureState.dy + 50 },
@@ -124,6 +103,7 @@ class SwipeCards extends React.Component {
               this.position.setValue({ x: 0, y: 0 });
             });
           });
+        // LEFT
         } else if (gestureState.dx < -120) {
           Animated.timing(this.position, {
             toValue: { x: -SCREEN_WIDTH - 100, y: gestureState.dy + 50 },
@@ -134,6 +114,7 @@ class SwipeCards extends React.Component {
               this.position.setValue({ x: 0, y: 0 });
             });
           });
+        // MIDDLE
         } else {
           Animated.spring(this.position, {
             toValue: { x: 0, y: 0 },
@@ -147,18 +128,18 @@ class SwipeCards extends React.Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <View style={{ flex: 1 }}>
+      <View>
+        <View>
           {profiles
             .map((item, i) => {
               if (i < this.state.currentIndex) {
                 return null;
-              } else if (i == this.state.currentIndex) {
+              } if (i == this.state.currentIndex) {
                 return (
                   <Animated.View
                     {...this.PanResponder.panHandlers}
                     key={i}
-                    style={[this.rotateAndTranslate, , styles.matchCard]}
+                    style={[this.rotateAndTranslate, styles.matchCard, {position: "absolute"}]}
                   >
                     <Animated.View
                       style={{
@@ -208,13 +189,7 @@ class SwipeCards extends React.Component {
                         NOPE
                       </Text>
                     </Animated.View>
-                    <TextPanel />
-                    <ButtonBar />
-                    <Image
-                      style={styles.image}
-                      source={item.uri}
-                      defaultSource={item.uri}
-                    />
+                    <MatchCardShape image={item.uri}/>
                   </Animated.View>
                 );
               } else {
@@ -222,16 +197,15 @@ class SwipeCards extends React.Component {
                   <Animated.View
                     key={i}
                     style={[
-                      styles.nextMatchCard,
+                      styles.matchCard,
                       {
                         opacity: this.nextCardOpacity,
                         transform: [{ scale: this.nextCardScale }],
+                        position: "absolute",
                       },
                     ]}
                   >
-                    <ButtonBar />
-                    <TextPanel />
-                    <Image style={styles.image} source={item.uri} />
+                    <MatchCardShape image={item.uri}/>
                   </Animated.View>
                 );
               }
@@ -243,124 +217,131 @@ class SwipeCards extends React.Component {
   }
 }
 
-const ButtonBar = (props) => (
-  <View style={styles.buttonBar}>
-    <CircleButton size={75} icon={"close"} color={"red"} margin={10} />
-    <View style={{ justifyContent: "center" }}>
-      <CircleButton
-        size={50}
-        icon={"musical-notes"}
-        color={"blue"}
-        margin={5}
-      />
-    </View>
-    <View style={{ justifyContent: "center" }}>
-      <CircleButton
-        size={50}
-        icon={"share-social"}
-        color={"purple"}
-        margin={5}
-      />
-    </View>
-    <CircleButton size={75} icon={"checkmark"} color={"green"} margin={10} />
-  </View>
-);
-
-const CircleButton = (props) => (
-  <TouchableOpacity
-    style={{
-      height: props.size,
-      width: props.size,
-      margin: props.margin,
-      alignItems: "center",
-      justifyContent: "center",
-      borderColor: props.color,
-      borderRadius: props.size * 2,
-      borderWidth: 1,
-    }}
-    onPress={props.onPress}
-  >
-    <Ionicons name={props.icon} size={props.size / 1.5} color={props.color} style={{fontStyle: "bold"}}/>
-  </TouchableOpacity>
-);
-
 const TextPanel = (props) => (
   <View style={styles.textPanel}>
     <Text style={{fontSize: 25, color: "white"}}>Prénom, 21</Text>
-    <View style={{width: SCREEN_WIDTH, flexDirection: "row",}}>
-      <Text style={styles.tagContainer}>Guitare</Text>
-      <Text style={styles.tagContainer}>Basse</Text>
-      <Text style={styles.tagContainer}>Violon</Text>
+  </View>
+);
+
+
+/// MUSIC PLAYER
+
+const MusicPlayer = (props) => (
+  <View style={{flexDirection:"row", justifyContent: "center", top: -70}}>
+    <View style={styles.musicPlayer}>
+      <View style={{
+        padding: 4,
+        borderColor: "black",
+        borderWidth: 3,
+        borderRadius: 95,
+      }}>
+        <View style={{
+        backgroundColor: "black",
+        padding: SCREEN_WIDTH*0.03,
+        borderRadius: 95,
+        }}>
+          <Ionicons name="pause-outline" size={40} color={"white"}/>
+        </View>
+      </View>
     </View>
   </View>
 );
 
 
+
+
+/// TOP BAR
+const TopBar = (props) => (
+  <View style={{
+    flexDirection: "row",
+    alignItems: "center",
+    margin: 20,
+  }}>
+    <Image style={styles.profilPic} source={require("../../assets/2.jpeg")}/>
+    <Text style={{fontSize: 20}}>Hi, </Text>
+    <Text style={{fontSize: 20, fontWeight: "bold"}}>Mattéo</Text>
+
+    <View style={{flex:1}}></View>
+
+    <Ionicons name="location" size={25}/>
+    <Ionicons style={{marginLeft: 10}} name="notifications" size={25}/>
+  </View>
+);
+
+
+
+
+/// BUTTON BAR
+const ButtonBar = (props) => (
+  <View style={{
+    flexDirection: "row",
+    alignItems: "center",
+    width: SCREEN_WIDTH*0.9,
+    justifyContent: "space-around",
+    marginTop: SCREEN_HEIGHT*0.03,
+  }}>
+    <View style={{
+      backgroundColor: "#FB7B72",
+      padding: 15,
+      borderRadius: 95,
+    }}>
+      <Ionicons name="close" size={40} color="white"/>
+    </View>
+    <Text style={{fontSize: 35}}>👋</Text>
+    <View style={{
+      backgroundColor: "#6355E4",
+      padding: 15,
+      borderRadius: 95,
+    }}>
+      <Ionicons name="heart" size={40} color="white"/>
+    </View>
+  </View>
+);
+
+
+/// STYLES
+
 const styles = StyleSheet.create({
-  appContainer: {
-    backgroundColor: "white",
-    paddingTop: SCREEN_HEIGHT * 0.05,
+  viewContainer: {
+    paddingTop: SCREEN_HEIGHT*0.05,
     flex: 1,
+    backgroundColor: "white",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   topBar: {
-    backgroundColor: "white",
     flexDirection: "row",
     alignContent: "center",
     justifyContent: "space-between",
-    paddingHorizontal: SCREEN_WIDTH * 0.05,
-    height: SCREEN_HEIGHT * 0.06,
-  },
-  matchContainer: {
-    backgroundColor: "white",
-    justifyContent: "center",
-    flex: 1,
   },
   matchCard: {
-    flex: 1,
-    height: SCREEN_HEIGHT * 0.8,
-    width: SCREEN_WIDTH,
-    position: "absolute",
-    padding: 10,
-  },
-  nextMatchCard: {
-    height: SCREEN_HEIGHT * 0.8,
-    width: SCREEN_WIDTH,
-    position: "absolute",
-    padding: 10,
+    height: SCREEN_HEIGHT * 0.6,
+    width: SCREEN_WIDTH*0.9,
+    zIndex: 2,
   },
   image: {
     flex: 1,
-    borderRadius: 15,
+    borderRadius: 35,
     height: null,
     width: null,
     resizeMode: "cover",
   },
-  buttonBar: {
-    position: "absolute",
-    zIndex: 1000,
-    bottom: 20,
-    width: SCREEN_WIDTH,
-    flexDirection: "row",
-    justifyContent: "center",
-    padding: 10,
-  },
   textPanel: {
     position: "absolute",
-    zIndex: 1000,
+    zIndex: 3,
     bottom: 125,
-    width: SCREEN_WIDTH,
-    padding: 10,
-    paddingLeft: SCREEN_HEIGHT*0.05,
+    marginLeft: SCREEN_WIDTH*0.05,
   },
-  tagContainer: {
-    backgroundColor: "gray",
-    padding: 5,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: "grey",
-    fontSize: 15,
-    color: "white",
-    marginHorizontal: 2,
-    overflow: "hidden",
-  }
+  musicPlayer: {
+    padding: 10,
+    backgroundColor: "white",
+    borderRadius: 95,
+    position: "absolute",
+  },
+  profilPic: {
+    width: 50,
+    height: 50,
+    borderRadius: 95,
+    marginRight: 10,
+  },
 });
