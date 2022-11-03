@@ -1,233 +1,196 @@
-import { StyleSheet, Text, View, Animated, Image, PanResponder, Dimensions } from "react-native";
+import { StyleSheet, Text, View, Animated, Image, PanResponder, Dimensions, SafeAreaView, TouchableHighlight } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
-import MatchCardShape from './matchCardShape';
-
+import MatchCardShape from "./matchCardShape";
 
 const profiles = [
   { id: "1", uri: require("../../assets/1.jpeg") },
   { id: "2", uri: require("../../assets/2.jpeg") },
   { id: "3", uri: require("../../assets/3.jpeg") },
-  { id: "4", uri: require("../../assets/4.jpeg") },
-  { id: "5", uri: require("../../assets/5.jpeg") },
-  { id: "6", uri: require("../../assets/1.jpeg") },
-  { id: "7", uri: require("../../assets/2.jpeg") },
-  { id: "8", uri: require("../../assets/3.jpeg") },
-  { id: "9", uri: require("../../assets/4.jpeg") },
-  { id: "10", uri: require("../../assets/5.jpeg") },
-];
-
-
+].reverse();
 
 export default function HomeScreen() {
   return (
-    <View style={styles.viewContainer}>
-      <TopBar />
-      <View>
-        <View style={styles.matchCard}>
-          <SwipeCards/>
+    <SafeAreaView style={styles.viewContainer}>
+      <View style={[styles.viewContent, {zIndex: 1}]}>
+        <TopBar />
+        <View style={{zIndex: 1}}>
+          <MatchCards/>
         </View>
-        <MusicPlayer/>
-        <ButtonBar/>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
-class SwipeCards extends React.Component {
-  constructor() {
-    super();
 
-    // Card position
-    this.position = new Animated.ValueXY({ x: 0, y: 0 });
-    this.state = { currentIndex: 0 };
 
-    // Card dragging animation
-    this.rotate = this.position.x.interpolate({
-      inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-      outputRange: ["-10deg", "0deg", "10deg"],
-      extrapolate: "clamp",
-    });
-    this.rotateAndTranslate = {
-      transform: [
-        {
-          rotate: this.rotate,
-        },
-        ...this.position.getTranslateTransform(),
-      ],
-    };
+/// TOP BAR
+const TopBar = (props) => (
+  <View style={{
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: SCREEN_WIDTH*0.04,
+    paddingTop: 10,
+  }}>
+    <Image style={styles.profilPic} source={require("../../assets/2.jpeg")}/>
+    <Text style={{fontSize: SCREEN_WIDTH>380 ? 20 : 18}}>Hi, </Text>
+    <Text style={{fontSize: SCREEN_WIDTH>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
 
-    // Card labels opacity animation
-    this.likeOpacity = this.position.x.interpolate({
-      inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-      outputRange: [0, 0, 1],
-      extrapolate: "clamp",
-    });
-    this.nopeOpacity = this.position.x.interpolate({
-      inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-      outputRange: [1, 0, 0],
-      extrapolate: "clamp",
-    });
+    <View style={{flex:1}}></View>
 
-    // Next card animation
-    this.nextCardOpacity = this.position.x.interpolate({
-      inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-      outputRange: [1, 0, 1],
-      extrapolate: "clamp",
-    });
-    this.nextCardScale = this.position.x.interpolate({
-      inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-      outputRange: [1, 0.8, 1],
-      extrapolate: "clamp",
-    });
-
-    // Card dragging handler
-    this.PanResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onPanResponderMove: (evt, gestureState) => {
-        this.position.setValue({ x: gestureState.dx, y: gestureState.dy });
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        // RIGHT
-        if (gestureState.dx > 120) {
-          Animated.timing(this.position, {
-            toValue: { x: SCREEN_WIDTH + 100, y: gestureState.dy + 50 },
-            useNativeDriver: true,
-            duration: 250,
-          }).start(() => {
-            this.setState({ currentIndex: this.state.currentIndex + 1 }, () => {
-              this.position.setValue({ x: 0, y: 0 });
-            });
-          });
-        // LEFT
-        } else if (gestureState.dx < -120) {
-          Animated.timing(this.position, {
-            toValue: { x: -SCREEN_WIDTH - 100, y: gestureState.dy + 50 },
-            useNativeDriver: true,
-            duration: 250,
-          }).start(() => {
-            this.setState({ currentIndex: this.state.currentIndex + 1 }, () => {
-              this.position.setValue({ x: 0, y: 0 });
-            });
-          });
-        // MIDDLE
-        } else {
-          Animated.spring(this.position, {
-            toValue: { x: 0, y: 0 },
-            friction: 4,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    });
-  }
-
-  render() {
-    return (
-      <View>
-        <View>
-          {profiles
-            .map((item, i) => {
-              if (i < this.state.currentIndex) {
-                return null;
-              } if (i == this.state.currentIndex) {
-                return (
-                  <Animated.View
-                    {...this.PanResponder.panHandlers}
-                    key={i}
-                    style={[this.rotateAndTranslate, styles.matchCard, {position: "absolute"}]}
-                  >
-                    <Animated.View
-                      style={{
-                        opacity: this.likeOpacity,
-                        transform: [{ rotate: "-30deg" }],
-                        position: "absolute",
-                        top: 50,
-                        left: 40,
-                        zIndex: 1000,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          borderWidth: 4,
-                          borderColor: "green",
-                          borderRadius: 25,
-                          color: "green",
-                          fontSize: 32,
-                          fontWeight: "800",
-                          padding: 10,
-                        }}
-                      >
-                        LIKE
-                      </Text>
-                    </Animated.View>
-                    <Animated.View
-                      style={{
-                        opacity: this.nopeOpacity,
-                        transform: [{ rotate: "30deg" }],
-                        position: "absolute",
-                        top: 50,
-                        right: 40,
-                        zIndex: 1000,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          borderWidth: 4,
-                          borderColor: "red",
-                          borderRadius: 25,
-                          color: "red",
-                          fontSize: 32,
-                          fontWeight: "800",
-                          padding: 10,
-                        }}
-                      >
-                        NOPE
-                      </Text>
-                    </Animated.View>
-                    <MatchCardShape image={item.uri}/>
-                  </Animated.View>
-                );
-              } else {
-                return (
-                  <Animated.View
-                    key={i}
-                    style={[
-                      styles.matchCard,
-                      {
-                        opacity: this.nextCardOpacity,
-                        transform: [{ scale: this.nextCardScale }],
-                        position: "absolute",
-                      },
-                    ]}
-                  >
-                    <MatchCardShape image={item.uri}/>
-                  </Animated.View>
-                );
-              }
-            })
-            .reverse()}
-        </View>
-      </View>
-    );
-  }
-}
-
-const TextPanel = (props) => (
-  <View style={styles.textPanel}>
-    <Text style={{fontSize: 25, color: "white"}}>Prénom, 21</Text>
+    <Ionicons name="location" size={SCREEN_WIDTH>380 ? 25 : 23}/>
+    <Ionicons style={{marginLeft: 10}} name="notifications" size={SCREEN_WIDTH>380 ? 25 : 23}/>
   </View>
 );
 
 
-/// MUSIC PLAYER
 
+/// SWIPEABLE CARDS
+const SwipeableCard = ({ item, removeCard, swipedDirection }) => {
+
+  const [position, setPosition] = useState(new Animated.ValueXY({ x: 0, y: 0 }));
+  let swipeDirection = "";
+
+  // Card dragging animation
+  let cardOpacity = new Animated.Value(1);
+  let rotate = position.x.interpolate({
+    inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
+    outputRange: ["-10deg", "0deg", "10deg"],
+    extrapolate: "clamp",
+  });
+  let rotateAndTranslate = {
+    transform: [
+      {
+        rotate: rotate,
+      },
+      ...position.getTranslateTransform(),
+    ],
+  };
+
+  let panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: (evt, gestureState) => false,
+    onMoveShouldSetPanResponder: (evt, gestureState) => true,
+    onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
+    onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+    onPanResponderMove: (evt, gestureState) => {
+      position.setValue({ x: gestureState.dx, y: gestureState.dy });
+      if (gestureState.dx > SCREEN_WIDTH - 250) {
+        swipeDirection = 'Right';
+      } else if (gestureState.dx < -SCREEN_WIDTH + 250) {
+        swipeDirection = 'Left';
+      }
+    },
+    onPanResponderRelease: (evt, gestureState) => {
+      // RIGHT
+      if (gestureState.dx > 120) {
+        Animated.parallel([
+          Animated.timing(position, {
+            toValue: { x: SCREEN_WIDTH + 100, y: gestureState.dy + 50 },
+            useNativeDriver: true,
+            duration: 250,
+          }),
+          Animated.timing(cardOpacity, {
+            toValue: 0,
+            duration: 250,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          swipedDirection(swipeDirection);
+          removeCard();
+        });
+      // LEFT
+      } else if (gestureState.dx < -120) {
+        Animated.parallel([
+          Animated.timing(position, {
+            toValue: { x: -SCREEN_WIDTH - 100, y: gestureState.dy + 50 },
+            useNativeDriver: true,
+            duration: 250,
+          }),
+          Animated.timing(cardOpacity, {
+            toValue: 0,
+            duration: 250,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          swipedDirection(swipeDirection);
+          removeCard();
+        });
+      // MIDDLE
+      } else {
+        swipedDirection('--');
+        Animated.spring(position, {
+          toValue: { x: 0, y: 0 },
+          friction: 4,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+  });
+
+  return (
+    <Animated.View
+        {...panResponder.panHandlers}
+        style={[
+          rotateAndTranslate,
+          styles.matchCard,
+          {
+            position: "absolute",
+            opacity: cardOpacity,
+          }
+        ]}>
+        <MatchCardShape image={item.uri}/>
+    </Animated.View>
+  )
+};
+
+const MatchCards = (props) => {
+  const [noMoreCard, setNoMoreCard] = useState(false);
+  const [deck, setDeck] = useState(profiles);
+  const [swipeDirection, setSwipeDirection] = useState('--');
+
+  const removeCard = (id) => {
+    //alert(id);
+    deck.splice(
+      deck.findIndex((item) => item.id == id), 
+      1
+    );
+    setDeck(deck);
+    if (deck.length == 0) {
+      setNoMoreCard(true);
+    }
+  };
+
+  const lastSwipedDirection = (swipeDirection) => {
+    setSwipeDirection(swipeDirection);
+  };
+
+  return (
+    <View style={styles.matchCard}>
+      {deck.map((card, key) => (
+        <SwipeableCard
+        key={key}
+        item={card}
+        removeCard={() => removeCard(card.id)}
+        swipedDirection={lastSwipedDirection}
+        />
+      ))}
+      {noMoreCard ? (
+        <Text style={{ fontSize: 22, color: '#000' }}>No Cards Found.</Text>
+      ) : null}
+      <MusicPlayer/>
+      <ButtonBar removeCardCMD={() => removeCard(card.id)} swipedDirectionCMD={lastSwipedDirection}/>
+    </View>
+  );
+}
+
+//
+
+/// MUSIC PLAYER
 const MusicPlayer = (props) => (
-  <View style={{flexDirection:"row", justifyContent: "center", top: -70}}>
     <View style={styles.musicPlayer}>
       <View style={{
         padding: 4,
@@ -237,77 +200,51 @@ const MusicPlayer = (props) => (
       }}>
         <View style={{
         backgroundColor: "black",
-        padding: SCREEN_WIDTH*0.03,
+        padding: SCREEN_HEIGHT*0.01,
         borderRadius: 95,
         }}>
-          <Ionicons name="pause-outline" size={40} color={"white"}/>
+          <Ionicons name="pause-outline" size={SCREEN_HEIGHT*0.05} color={"white"}/>
         </View>
       </View>
     </View>
-  </View>
 );
-
-
-
-
-/// TOP BAR
-const TopBar = (props) => (
-  <View style={{
-    flexDirection: "row",
-    alignItems: "center",
-    margin: 20,
-  }}>
-    <Image style={styles.profilPic} source={require("../../assets/2.jpeg")}/>
-    <Text style={{fontSize: 20}}>Hi, </Text>
-    <Text style={{fontSize: 20, fontWeight: "bold"}}>Mattéo</Text>
-
-    <View style={{flex:1}}></View>
-
-    <Ionicons name="location" size={25}/>
-    <Ionicons style={{marginLeft: 10}} name="notifications" size={25}/>
-  </View>
-);
-
 
 
 
 /// BUTTON BAR
-const ButtonBar = (props) => (
-  <View style={{
-    flexDirection: "row",
-    alignItems: "center",
-    width: SCREEN_WIDTH*0.9,
-    justifyContent: "space-around",
-    marginTop: SCREEN_HEIGHT*0.03,
-  }}>
+const ButtonBar = (removeCardCMD, swipedDirectionCMD) => (
+  <View style={styles.buttonBar}>
+    <TouchableHighlight onPress={()=>{removeCardCMD, swipedDirectionCMD}}>
+      <View style={{
+        backgroundColor: "#FB7B72",
+        padding: SCREEN_HEIGHT*0.01,
+        borderRadius: 95,
+      }}>
+          <Ionicons name="close" size={SCREEN_HEIGHT*0.05} color="white"/>
+      </View>
+    </TouchableHighlight>
+    <Text style={{fontSize: SCREEN_HEIGHT*0.04}}>👋</Text>
     <View style={{
-      backgroundColor: "#FB7B72",
-      padding: 15,
+      backgroundColor: "#6355EA",
+      padding: SCREEN_HEIGHT*0.01,
       borderRadius: 95,
     }}>
-      <Ionicons name="close" size={40} color="white"/>
-    </View>
-    <Text style={{fontSize: 35}}>👋</Text>
-    <View style={{
-      backgroundColor: "#6355E4",
-      padding: 15,
-      borderRadius: 95,
-    }}>
-      <Ionicons name="heart" size={40} color="white"/>
+      <Ionicons name="musical-note" size={SCREEN_HEIGHT*0.05} color="white"/>
     </View>
   </View>
 );
 
 
-/// STYLES
 
+/// STYLES
 const styles = StyleSheet.create({
   viewContainer: {
-    paddingTop: SCREEN_HEIGHT*0.05,
     flex: 1,
     backgroundColor: "white",
-    alignItems: "center",
     justifyContent: "space-between",
+  },
+  viewContent: {
+    alignItems: "center",
   },
   topBar: {
     flexDirection: "row",
@@ -315,32 +252,29 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   matchCard: {
-    height: SCREEN_HEIGHT * 0.6,
-    width: SCREEN_WIDTH*0.9,
-    zIndex: 2,
-  },
-  image: {
-    flex: 1,
-    borderRadius: 35,
-    height: null,
-    width: null,
-    resizeMode: "cover",
-  },
-  textPanel: {
-    position: "absolute",
-    zIndex: 3,
-    bottom: 125,
-    marginLeft: SCREEN_WIDTH*0.05,
+    padding: 10,
+    height: SCREEN_HEIGHT * 0.7,
+    width: SCREEN_HEIGHT*0.7/1.5232013479,
+    zIndex: 1,
+    alignItems: "center",
   },
   musicPlayer: {
-    padding: 10,
     backgroundColor: "white",
     borderRadius: 95,
     position: "absolute",
+    bottom: 0,
+  },
+  buttonBar: {
+    position: "absolute",
+    bottom: -SCREEN_HEIGHT*0.07,
+    flexDirection: "row",
+    alignItems: "center",
+    width: SCREEN_WIDTH*0.9,
+    justifyContent: "space-around",
   },
   profilPic: {
-    width: 50,
-    height: 50,
+    width: SCREEN_WIDTH*0.1,
+    height: SCREEN_WIDTH*0.1,
     borderRadius: 95,
     marginRight: 10,
   },
