@@ -7,11 +7,7 @@ const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 import MatchCardShape from "./matchCardShape";
 
-const profiles = [
-  { id: "1", uri: require("../../assets/1.jpeg") },
-  { id: "2", uri: require("../../assets/2.jpeg") },
-  { id: "3", uri: require("../../assets/3.jpeg") },
-].reverse();
+import { profiles } from './data';
 
 export default function HomeScreen() {
   return (
@@ -153,7 +149,7 @@ const MatchCards = (props) => {
   const [swipeDirection, setSwipeDirection] = useState('--');
 
   const removeCard = (id) => {
-    //alert(id);
+    alert(id);
     deck.splice(
       deck.findIndex((item) => item.id == id), 
       1
@@ -170,19 +166,23 @@ const MatchCards = (props) => {
 
   return (
     <View style={styles.matchCard}>
-      {deck.map((card, key) => (
-        <SwipeableCard
-        key={key}
-        item={card}
-        removeCard={() => removeCard(card.id)}
-        swipedDirection={lastSwipedDirection}
-        />
-      ))}
+      {deck.map((card, key) => {
+
+        return (
+          <SwipeableCard
+            key={key}
+            item={card}
+            removeCard={() => removeCard(card.id)}
+            swipedDirection={lastSwipedDirection}
+          />
+        );
+      })
+      }
       {noMoreCard ? (
         <Text style={{ fontSize: 22, color: '#000' }}>No Cards Found.</Text>
       ) : null}
       <MusicPlayer/>
-      <ButtonBar removeCardCMD={() => removeCard(card.id)} swipedDirectionCMD={lastSwipedDirection}/>
+      <ButtonBar/>
     </View>
   );
 }

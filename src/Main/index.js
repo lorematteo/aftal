@@ -4,10 +4,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { Ionicons } from '@expo/vector-icons';
 
-import HomeScreen from './screens/home';
-import DiscoverScreen from './screens/discover';
-import ChatScreen from './screens/chat';
-import ProfilScreen from './screens/profil';
+import HomeScreen from '../Home/home';
+import DiscoverScreen from '../Discover/discover';
+import ChatScreen from '../Chat/chat';
+import ProfilScreen from '../Profil/profil';
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height;

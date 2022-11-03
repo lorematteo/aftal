@@ -1,4 +1,4 @@
-import MainScreen from "./navigation/MainScreen";
+import MainScreen from "./src/Main/index";
 
 export default function App() {
   return (
