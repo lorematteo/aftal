@@ -1,22 +1,20 @@
-import { StyleSheet, Text, View, Animated, Image, PanResponder, Dimensions, SafeAreaView, TouchableHighlight } from "react-native";
+import { StyleSheet, Text, View, Animated, Image, PanResponder, SafeAreaView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback, useEffect} from "react";
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const SCREEN_HEIGHT = Dimensions.get("window").height;
+import { width, height, CARDSIZE, ACTION_OFFSET} from '../../utils/constants';
 
-import MatchCardShape from "./matchCardShape";
+import Card from './cardComponent';
 
-import { profiles } from './data';
+import { profiles as profilesObj } from './data';
 
 export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.viewContainer}>
-      <View style={[styles.viewContent, {zIndex: 1}]}>
+      <View style={styles.viewContent}>
         <TopBar />
-        <View style={{zIndex: 1}}>
-          <MatchCards/>
-        </View>
+        <MatchContainer/>
+        <View></View>
       </View>
     </SafeAreaView>
   );
@@ -29,211 +27,170 @@ const TopBar = (props) => (
   <View style={{
     flexDirection: "row",
     alignItems: "center",
-    marginHorizontal: SCREEN_WIDTH*0.04,
+    marginHorizontal: width*0.04,
     paddingTop: 10,
   }}>
     <Image style={styles.profilPic} source={require("../../assets/2.jpeg")}/>
-    <Text style={{fontSize: SCREEN_WIDTH>380 ? 20 : 18}}>Hi, </Text>
-    <Text style={{fontSize: SCREEN_WIDTH>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
+    <Text style={{fontSize: width>380 ? 20 : 18}}>Hi, </Text>
+    <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
 
     <View style={{flex:1}}></View>
 
-    <Ionicons name="location" size={SCREEN_WIDTH>380 ? 25 : 23}/>
-    <Ionicons style={{marginLeft: 10}} name="notifications" size={SCREEN_WIDTH>380 ? 25 : 23}/>
+    <Ionicons name="location" size={width>380 ? 25 : 23}/>
+    <Ionicons style={{marginLeft: 10}} name="notifications" size={width>380 ? 25 : 23}/>
   </View>
 );
 
 
 
 /// SWIPEABLE CARDS
-const SwipeableCard = ({ item, removeCard, swipedDirection }) => {
+function MatchContainer(){
 
-  const [position, setPosition] = useState(new Animated.ValueXY({ x: 0, y: 0 }));
-  let swipeDirection = "";
+  const swipe = useRef(new Animated.ValueXY()).current;
+  const tiltSign = useRef(new Animated.Value(1)).current;
+  const [profiles, setProfiles] = useState(profilesObj);
 
-  // Card dragging animation
-  let cardOpacity = new Animated.Value(1);
-  let rotate = position.x.interpolate({
-    inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-    outputRange: ["-10deg", "0deg", "10deg"],
-    extrapolate: "clamp",
-  });
-  let rotateAndTranslate = {
-    transform: [
-      {
-        rotate: rotate,
-      },
-      ...position.getTranslateTransform(),
-    ],
-  };
-
-  let panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: (evt, gestureState) => false,
-    onMoveShouldSetPanResponder: (evt, gestureState) => true,
-    onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
-    onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-    onPanResponderMove: (evt, gestureState) => {
-      position.setValue({ x: gestureState.dx, y: gestureState.dy });
-      if (gestureState.dx > SCREEN_WIDTH - 250) {
-        swipeDirection = 'Right';
-      } else if (gestureState.dx < -SCREEN_WIDTH + 250) {
-        swipeDirection = 'Left';
-      }
-    },
-    onPanResponderRelease: (evt, gestureState) => {
-      // RIGHT
-      if (gestureState.dx > 120) {
-        Animated.parallel([
-          Animated.timing(position, {
-            toValue: { x: SCREEN_WIDTH + 100, y: gestureState.dy + 50 },
-            useNativeDriver: true,
-            duration: 250,
-          }),
-          Animated.timing(cardOpacity, {
-            toValue: 0,
-            duration: 250,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-          swipedDirection(swipeDirection);
-          removeCard();
-        });
-      // LEFT
-      } else if (gestureState.dx < -120) {
-        Animated.parallel([
-          Animated.timing(position, {
-            toValue: { x: -SCREEN_WIDTH - 100, y: gestureState.dy + 50 },
-            useNativeDriver: true,
-            duration: 250,
-          }),
-          Animated.timing(cardOpacity, {
-            toValue: 0,
-            duration: 250,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-          swipedDirection(swipeDirection);
-          removeCard();
-        });
-      // MIDDLE
-      } else {
-        swipedDirection('--');
-        Animated.spring(position, {
-          toValue: { x: 0, y: 0 },
-          friction: 4,
-          useNativeDriver: true,
-        }).start();
-      }
-    },
-  });
-
-  return (
-    <Animated.View
-        {...panResponder.panHandlers}
-        style={[
-          rotateAndTranslate,
-          styles.matchCard,
-          {
-            position: "absolute",
-            opacity: cardOpacity,
-          }
-        ]}>
-        <MatchCardShape image={item.uri}/>
-    </Animated.View>
-  )
-};
-
-const MatchCards = (props) => {
-  const [noMoreCard, setNoMoreCard] = useState(false);
-  const [deck, setDeck] = useState(profiles);
-  const [swipeDirection, setSwipeDirection] = useState('--');
-
-  const removeCard = (id) => {
-    alert(id);
-    deck.splice(
-      deck.findIndex((item) => item.id == id), 
-      1
-    );
-    setDeck(deck);
-    if (deck.length == 0) {
-      setNoMoreCard(true);
+  useEffect(() => {
+    if (profiles.length === 0) {
+      setProfiles(profilesObj);
     }
-  };
+  }, [profiles]);
 
-  const lastSwipedDirection = (swipeDirection) => {
-    setSwipeDirection(swipeDirection);
-  };
+  const panResponder = useRef(
+    PanResponder.create({
+        onMoveShouldSetPanResponder: (evt, gestureState) => true,
+        onPanResponderMove: (e, { dx, dy, y0 }) => {
+          // 1: sens horaire | -1: sens anti-horaire
+          tiltSign.setValue(y0 > CARDSIZE.HEIGHT / 2 ? 1 : -1);
+          swipe.setValue({ x: dx, y: dy });
+        },
+        onPanResponderRelease: (e, { dx, dy }) => {
+          const direction = Math.sign(dx);
+          const userAction = Math.abs(dx) > ACTION_OFFSET;
+
+          if (userAction) {
+            Animated.timing(swipe, {
+              duration: 200,
+              toValue: {
+                x: direction * CARDSIZE.OUTWIDTH,
+                y: dy,
+              },
+              useNativeDriver: true,
+            }).start(transitionNext);
+          } else {
+            Animated.spring(swipe, {
+              friction: 5,
+              toValue: {
+                x: 0,
+                y: 0,
+              },
+              useNativeDriver: true,
+            }).start();
+          }
+        },
+    })
+  ).current;
+
+  const transitionNext = useCallback(() => {
+      setProfiles((prevState) => prevState.slice(1));
+      swipe.setValue({ x: 0, y: 0 });
+    }, [swipe]);
+  
+  const handleChoice = useCallback(
+    (sign) => {
+      Animated.timing(swipe.x, {
+        duration: 400,
+        toValue: sign * CARDSIZE.OUTWIDTH,
+        useNativeDriver: true,
+      }).start(transitionNext);
+    },
+    [swipe.x, transitionNext]
+  );
 
   return (
     <View style={styles.matchCard}>
-      {deck.map((card, key) => {
+      {profiles
+        .map(({ name, source }, index) => {
+          const isFirst = index === 0;
+          const panHandlers = isFirst ? panResponder.panHandlers : {};
 
-        return (
-          <SwipeableCard
-            key={key}
-            item={card}
-            removeCard={() => removeCard(card.id)}
-            swipedDirection={lastSwipedDirection}
-          />
-        );
-      })
+          return (
+            <Card
+              key={name}
+              name={name}
+              source={source}
+              isFirst={isFirst}
+              swipe={swipe}
+              tiltSign={tiltSign}
+              {...panHandlers}
+            />
+          );
+        })
+        .reverse()
       }
-      {noMoreCard ? (
-        <Text style={{ fontSize: 22, color: '#000' }}>No Cards Found.</Text>
-      ) : null}
-      <MusicPlayer/>
-      <ButtonBar/>
+
+      <MusicPlayer handleSong={() => alert("play music")}/>
+
+      <ButtonBar
+        handleLike={() => handleChoice(1)}
+        handleNo={() => handleChoice(-1)}
+        emoji={(profiles.length === 0 ) ? "" : profiles[0].emoji}
+      />
+
     </View>
   );
 }
 
-//
 
 /// MUSIC PLAYER
-const MusicPlayer = (props) => (
-    <View style={styles.musicPlayer}>
-      <View style={{
-        padding: 4,
-        borderColor: "black",
-        borderWidth: 3,
-        borderRadius: 95,
-      }}>
+function MusicPlayer({handleSong}) {
+  return (
+    <TouchableOpacity onPress={handleSong} style={styles.musicPlayer}>
         <View style={{
-        backgroundColor: "black",
-        padding: SCREEN_HEIGHT*0.01,
-        borderRadius: 95,
+          padding: 4,
+          borderColor: "black",
+          borderWidth: 3,
+          borderRadius: 95,
         }}>
-          <Ionicons name="pause-outline" size={SCREEN_HEIGHT*0.05} color={"white"}/>
+          <View style={{
+            backgroundColor: "black",
+            padding: height*0.01,
+            borderRadius: 95,
+          }}>
+            <Ionicons name="pause-outline" size={height*0.05} color={"white"}/>
+          </View>
         </View>
-      </View>
-    </View>
-);
-
+    </TouchableOpacity>
+  )
+};
 
 
 /// BUTTON BAR
-const ButtonBar = (removeCardCMD, swipedDirectionCMD) => (
-  <View style={styles.buttonBar}>
-    <TouchableHighlight onPress={()=>{removeCardCMD, swipedDirectionCMD}}>
-      <View style={{
-        backgroundColor: "#FB7B72",
-        padding: SCREEN_HEIGHT*0.01,
-        borderRadius: 95,
-      }}>
-          <Ionicons name="close" size={SCREEN_HEIGHT*0.05} color="white"/>
-      </View>
-    </TouchableHighlight>
-    <Text style={{fontSize: SCREEN_HEIGHT*0.04}}>👋</Text>
-    <View style={{
-      backgroundColor: "#6355EA",
-      padding: SCREEN_HEIGHT*0.01,
-      borderRadius: 95,
-    }}>
-      <Ionicons name="musical-note" size={SCREEN_HEIGHT*0.05} color="white"/>
+function ButtonBar({ handleLike, handleNo, emoji }) {
+  return (
+    <View style={styles.buttonBar}>
+      <TouchableOpacity onPress={handleNo}>
+        <View style={{
+          backgroundColor: "#FB7B72",
+          padding: height*0.01,
+          borderRadius: 95,
+        }}>
+            <Ionicons name="close" size={height*0.05} color="white"/>
+        </View>
+      </TouchableOpacity>
+      <Text style={{fontSize: height*0.04}}>{emoji}</Text>
+      <TouchableOpacity onPress={handleLike}>
+        <View style={{
+          backgroundColor: "#6355EA",
+          padding: height*0.01,
+          borderRadius: 95,
+        }}>
+          <Ionicons name="musical-note" size={height*0.05} color="white"/>
+        </View>
+      </TouchableOpacity>
     </View>
-  </View>
-);
-
+  )
+};
 
 
 /// STYLES
@@ -244,7 +201,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   viewContent: {
+    flex: 1,
     alignItems: "center",
+    justifyContent: "space-between",
+    paddingBottom: height*0.08,
   },
   topBar: {
     flexDirection: "row",
@@ -253,8 +213,8 @@ const styles = StyleSheet.create({
   },
   matchCard: {
     padding: 10,
-    height: SCREEN_HEIGHT * 0.7,
-    width: SCREEN_HEIGHT*0.7/1.5232013479,
+    height: CARDSIZE.HEIGHT,
+    width: CARDSIZE.WIDTH,
     zIndex: 1,
     alignItems: "center",
   },
@@ -266,15 +226,15 @@ const styles = StyleSheet.create({
   },
   buttonBar: {
     position: "absolute",
-    bottom: -SCREEN_HEIGHT*0.07,
+    bottom: -height*0.08,
     flexDirection: "row",
     alignItems: "center",
-    width: SCREEN_WIDTH*0.9,
+    width: width*0.9,
     justifyContent: "space-around",
   },
   profilPic: {
-    width: SCREEN_WIDTH*0.1,
-    height: SCREEN_WIDTH*0.1,
+    width: width*0.1,
+    height: width*0.1,
     borderRadius: 95,
     marginRight: 10,
   },

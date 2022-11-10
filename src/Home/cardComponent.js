@@ -1,10 +1,9 @@
 import React from 'react';
-import { Animated } from 'react-native';
+import { Animated, Text, StyleSheet } from 'react-native';
 
-import { ACTION_OFFSET } from '../../utils/constants';
-import { LinearGradient } from 'expo-linear-gradient';
+import { width, height, CARDSIZE, ACTION_OFFSET } from '../../utils/constants';
 
-import { width, height, CARD, VERTICAL_MARGIN } from '../../utils/constants';
+import MatchCardShape from "./matchCardShape";
 
 export default function Card({
   name,
@@ -36,70 +35,78 @@ export default function Card({
   };
 
   return (
-    <Animated.View
-      style={
-        [
-            isFirst && animatedCardStyle,
-            {
-                position: "absolute",
-                //opacity: cardOpacity,
-            }
-        ]}
-      {...rest}
-    >
-      <MatchCardShape image={item.uri}/>
-      <Gradient />
-      <Name>{name}</Name>
+    <Animated.View style={[styles.cardContainer, isFirst && animatedCardStyle]} {...rest}>
+
+      <MatchCardShape image={source}/>
+      
+      <Text style={styles.cardName}>{name}</Text>
+
       {isFirst && (
         <>
-          <Like type="like" style={{ opacity: likeOpacity }} />
-          <Nope type="nope" style={{ opacity: nopeOpacity }} />
+          <Choice type="like" style={{ 
+            opacity: likeOpacity,
+            top: height*0.12,
+            left: width * 0.1,
+            transform: [{rotate: "-30deg"}],
+            }}
+          />
+          <Choice type="nope" style={{ 
+            opacity: nopeOpacity,
+            top: height*0.12,
+            right: width*0.1,
+            transform: [{rotate: "30deg"}],
+            }}
+          />
         </>
       )}
     </Animated.View>
   );
 }
 
-
-const Name = styled.Text`
-  position: absolute;
-  font-size: 35px;
-  font-weight: bold;
-  color: white;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-  letter-spacing: 0.5px;
-  bottom: 25px;
-  left: 20px;
-`;
-
-const Gradient = styled(LinearGradient).attrs({
-  colors: ['transparent', 'rgba(0, 0, 0, 0.9)'],
-})`
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  height: 150px;
-  border-radius: ${CARD.CARD_BORDER_RADIUS}px;
-`;
-
-function Choice({ type }) {
-    const color = COLORS[type];
+function Choice({ type, style }) {
+    const color = (type == "like") ? "green" : "red";
   
     return (
-      <View style={[styles.container, { borderColor: color }]}>
-        <Text style={[styles.text, { color }]}>{type}</Text>
-      </View>
+      <Animated.View type={type} style={[style, styles.choiceContainer, {borderColor: color}]}>
+        <Text type={type} style={[styles.choiceText, {color: color}]}>{type} </Text>
+      </Animated.View>
     );
 }
 
-const Like = styled(Choice)`
-  top: ${height * 0.12}px;
-  left: ${width * 0.1}px;
-  transform: rotate(-30deg);
-`;
-
-const Nope = styled(Choice)`
-  top: ${height * 0.12}px;
-  right: ${width * 0.1}px;
-  transform: rotate(30deg);
-`;
+const styles = StyleSheet.create({
+  cardContainer: {
+    position: "absolute",
+    zIndex: 10,
+    width: CARDSIZE.WIDTH, 
+    height: CARDSIZE.HEIGHT,
+    padding: 10,
+    alignItems: "center",
+  },
+  cardName: {
+    position: "absolute",
+    fontSize: 35,
+    fontWeight: "bold",
+    color: "white",
+    textShadowColor: "rgba(0, 0, 0, 0.4)",
+    textShadowOffset: {width: 1,height: 5},
+    textShadowRadius: 0,
+    letterSpacing: 0.5,
+    bottom: CARDSIZE.HEIGHT*0.2,
+    left: 20,
+  },
+  choiceContainer: {
+    position: "absolute",
+    borderWidth: 6,
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+    borderRadius: 10,
+    background: "rgba(0, 0, 0, 0.2)",
+  },
+  choiceText: {
+    fontSize: 45,
+    textAlign: "center",
+    fontWeight: "bold",
+    textTransformation: "uppercase",
+    letterSpacing: 5,
+  }
+})
