@@ -1,7 +1,7 @@
-import React from 'react';
-import { Animated, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { Animated, Text, StyleSheet } from "react-native";
 
-import { width, height, CARDSIZE, ACTION_OFFSET } from '../../utils/constants';
+import { width, height, CARDSIZE, ACTION_OFFSET } from "../../../utils/constants";
 
 import MatchCardShape from "./matchCardShape";
 

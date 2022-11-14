@@ -1,10 +1,15 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 
 export default function DiscoverScreen(){
     return (
-        <View style={styles.Appcontainer}>
-            <Text>Discover new activities.</Text>
-        </View>
+        <SafeAreaView>
+            <ScrollView>
+                <Text>Découvrir</Text>
+                <View>
+                    <Text>Item 1</Text>
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 

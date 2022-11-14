@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { Ionicons } from '@expo/vector-icons';
 
-import HomeScreen from '../Home/home';
+import HomeScreenStack from '../Home/home';
 import DiscoverScreen from '../Discover/discover';
 import ChatScreen from '../Chat/chat';
 import ProfilScreen from '../Profil/profil';
@@ -41,7 +41,7 @@ export default function MainScreen() {
         headerShown: false,
         tabBarShowLabel: false,
       })}>
-        <Tab.Screen name="Home" component={HomeScreen}/>
+        <Tab.Screen name="Home" component={HomeScreenStack}/>
         <Tab.Screen name="Discover" component={DiscoverScreen}/>
         <Tab.Screen name="Chat" component={ChatScreen}/>
         <Tab.Screen name="Profil" component={ProfilScreen}/>
