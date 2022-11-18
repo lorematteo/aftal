@@ -12,17 +12,24 @@ export default function SignScreen(){
     const handleSignUp = async () => {
         await auth().createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
-                // Signed in 
                 const user = userCredential.user;
-                console.log(user)
-                // ...
+                console.log("user created successfully");
             })
             .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // ..
+                console.log(error);
             });
     }
+
+    const handleSignIn = async () => {
+        await auth().signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                console.log("user logged successfully");
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+      }
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
@@ -32,7 +39,7 @@ export default function SignScreen(){
             </View>
 
             <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={() => { }} style={styles.button}>
+                <TouchableOpacity onPress={handleSignIn} style={styles.button}>
                     <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleSignUp} style={[styles.button, styles.buttonOutLine]}>
