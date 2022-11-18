@@ -449,6 +449,9 @@ PODS:
     - Firebase/Auth (= 10.2.0)
     - React-Core
     - RNFBApp
+  - RNScreens (3.18.2):
+    - React-Core
+    - React-RCTImage
   - RNSVG (12.3.0):
     - React-Core
   - Yoga (1.14.0)
@@ -510,6 +513,7 @@ DEPENDENCIES:
   - "RNFBAnalytics (from `../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
+  - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -634,6 +638,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBAuth:
     :path: "../node_modules/@react-native-firebase/auth"
+  RNScreens:
+    :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   Yoga:
@@ -705,6 +711,7 @@ SPEC CHECKSUMS:
   RNFBAnalytics: 3e567afde3aaa1751159004da40537d9ad9b623c
   RNFBApp: e09bdbd381e36f6d92b1a96442a652fd71bddb95
   RNFBAuth: 9e65b11d801abaca3e9da310ecd97fc2caa63531
+  RNScreens: 34cc502acf1b916c582c60003dc3089fa01dc66d
   RNSVG: 302bfc9905bd8122f08966dc2ce2d07b7b52b9f8
   Yoga: 75bf4b0131cfb46a659cd0c13309b79a6fcff66d
 
