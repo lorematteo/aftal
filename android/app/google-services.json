@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "802202870854",
+    "project_id": "aftal-b674",
+    "storage_bucket": "aftal-b674.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:802202870854:android:54e16fb95747f0d4ab9647",
+        "android_client_info": {
+          "package_name": "com.lorematteo.aftal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "802202870854-e3f7qvkio0r8mqft45cgfble3okdpt62.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lorematteo.aftal",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "802202870854-69ncrjel7ora5olfptons8lptl2f9va3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1BRTciuAdqRO2bEY-jCqVTFmoSPqe6_I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "802202870854-69ncrjel7ora5olfptons8lptl2f9va3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "802202870854-7lb4v828fgks0beeotg6kmi8ubh9rk6i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "host.exp.exponent"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
