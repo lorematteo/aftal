@@ -1,9 +1,7 @@
 import React from "react";
-import { Animated, Text, StyleSheet } from "react-native";
+import { Animated, Text, StyleSheet, Image } from "react-native";
 
 import { width, height, CARDSIZE, ACTION_OFFSET } from "../../../utils/constants";
-
-import MatchCardShape from "./matchCardShape";
 
 export default function Card({
   name,
@@ -37,7 +35,7 @@ export default function Card({
   return (
     <Animated.View style={[styles.cardContainer, isFirst && animatedCardStyle]} {...rest}>
 
-      <MatchCardShape image={source}/>
+      <Image source={source} style={styles.image} />
       
       <Text style={styles.cardName}>{name}</Text>
 
@@ -76,10 +74,6 @@ function Choice({ type, style }) {
 const styles = StyleSheet.create({
   cardContainer: {
     position: "absolute",
-    zIndex: 10,
-    width: CARDSIZE.WIDTH, 
-    height: CARDSIZE.HEIGHT,
-    padding: 10,
     alignItems: "center",
   },
   cardName: {
@@ -93,6 +87,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     bottom: CARDSIZE.HEIGHT*0.2,
     left: 20,
+  },
+  image: {
+    width: CARDSIZE.WIDTH,
+    height: CARDSIZE.HEIGHT,
+    borderRadius: CARDSIZE.BORDERRADIUS,
   },
   choiceContainer: {
     position: "absolute",

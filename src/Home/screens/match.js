@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Animated, Image, PanResponder, SafeAreaView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useRef, useCallback, useEffect} from "react";
+import Svg, { Path } from 'react-native-svg';
 
 import { width, height, CARDSIZE, ACTION_OFFSET, Android} from '../../../utils/constants';
 
@@ -11,12 +12,9 @@ import { profiles as profilesObj } from '../data';
 
 export default function MatchScreen({ navigation }) {
   return (
-    <SafeAreaView style={[styles.viewContainer, Android.SafeArea]}>
-      <View style={styles.viewContent}>
-        <TopBar nav={navigation} />
-        <MatchContainer/>
-        <View></View>
-      </View>
+    <SafeAreaView style={[styles.viewContent, Android.SafeArea]}>
+      <TopBar nav={navigation} />
+      <MatchContainer/>
     </SafeAreaView>
   );
 }
@@ -136,38 +134,53 @@ function MatchContainer(){
         .reverse()
       }
 
-      <MusicPlayer handleSong={() => alert("play music")}/>
+      <View style={styles.buttonsBox}>
+        <MusicPlayer handleSong={() => alert("play music")}/>
 
-      <ButtonBar
-        handleLike={() => handleChoice(1)}
-        handleNo={() => handleChoice(-1)}
-        emoji={(profiles.length === 0 ) ? "" : profiles[0].emoji}
-      />
+        <ButtonBar
+          handleLike={() => handleChoice(1)}
+          handleNo={() => handleChoice(-1)}
+          emoji={(profiles.length === 0 ) ? "" : profiles[0].emoji}
+        />
+      </View>
 
     </View>
   );
 }
 
-
 /// MUSIC PLAYER
 function MusicPlayer({handleSong}) {
+
+  const ButtonShape = (props) => (
+    <Svg width="100%" height="100%" viewBox="0 0 241.5 179.5" fill="white">
+      <Path
+        d="M242 116.951S212 119.5 212 90c0 0 2-42-32-68.5 0 0-20.727-21.22-58.75-21.497C83.227.279 62.5 21.5 62.5 21.5 28.5 48 30.5 90 30.5 90c0 29.5-30 26.951-30 26.951S34.5 123 53.671 149c0 0 19.625 30.185 67.579 30.498 47.955-.313 67.579-30.498 67.579-30.498C208 123 242 116.951 242 116.951Z"
+        fill="#fff"
+      />
+    </Svg>
+  )
+
   return (
-    <TouchableOpacity onPress={handleSong} style={styles.musicPlayer}>
+    <View style={styles.musicPlayer}>
+      <ButtonShape/>
+      <TouchableOpacity onPress={handleSong} style={{position: "absolute"}}>
         <View style={{
-          padding: 4,
+          padding: height>700 ? 4 : 3,
           borderColor: "black",
-          borderWidth: 3,
+          borderWidth: height>700 ? 3 : 2,
           borderRadius: 95,
         }}>
           <View style={{
             backgroundColor: "black",
-            padding: height*0.01,
             borderRadius: 95,
+            padding: CARDSIZE.BUTTONSHAPEHEIGHT*0.1,
           }}>
-            <Ionicons name="pause-outline" size={height*0.05} color={"white"}/>
+            <Ionicons name="pause-outline" size={CARDSIZE.BUTTONSHAPEHEIGHT*0.4} color={"white"}/>
           </View>
         </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
+    
   )
 };
 
@@ -202,16 +215,11 @@ function ButtonBar({ handleLike, handleNo, emoji }) {
 
 /// STYLES
 const styles = StyleSheet.create({
-  viewContainer: {
-    flex: 1,
-    backgroundColor: "white",
-    justifyContent: "space-between",
-  },
   viewContent: {
     flex: 1,
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingBottom: height*0.08,
   },
   topBar: {
     flexDirection: "row",
@@ -219,25 +227,35 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   matchCard: {
-    padding: 10,
-    height: CARDSIZE.HEIGHT,
-    width: CARDSIZE.WIDTH,
+    flex: 1,
+    marginTop: 15,
     zIndex: 1,
     alignItems: "center",
   },
-  musicPlayer: {
+  buttonsBox: {
     backgroundColor: "white",
-    borderRadius: 95,
+    width: width,
+    flex: 1,
+    top: CARDSIZE.HEIGHT,
+    alignItems: "center",
+  },
+  musicPlayer: {
     position: "absolute",
-    bottom: 0,
+    width: CARDSIZE.BUTTONSHAPEWIDTH,
+    height: CARDSIZE.BUTTONSHAPEHEIGHT,
+    top: height>700 ? -CARDSIZE.HEIGHT*0.1 : -CARDSIZE.HEIGHT*0.092,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2,
   },
   buttonBar: {
-    position: "absolute",
-    bottom: -height*0.08,
+    width: width,
+    paddingTop: CARDSIZE.HEIGHT*0.05,
     flexDirection: "row",
+    paddingHorizontal: width*0.07,
     alignItems: "center",
-    width: width*0.9,
     justifyContent: "space-around",
+    zIndex: 1,
   },
   profilPic: {
     width: width*0.1,

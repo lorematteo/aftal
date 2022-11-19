@@ -3,10 +3,12 @@ import { Dimensions, StyleSheet, Platform, StatusBar } from "react-native";
 export const { width, height } = Dimensions.get("screen");
 
 export const CARDSIZE = {
-    WIDTH: height*0.7/1.5232013479,
-    HEIGHT: height * 0.7,
+    WIDTH: width*0.9,
+    HEIGHT: height>700 ? height * 0.65 : height * 0.69,
     OUTWIDTH: width * 1.5,
-    BORDERRADIUS: 30,
+    BORDERRADIUS: 50,
+    BUTTONSHAPEWIDTH: (height * 0.1) * 1.345,
+    BUTTONSHAPEHEIGHT : height * 0.1,
   };
   
 export const ACTION_OFFSET = 100;
