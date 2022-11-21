@@ -30,7 +30,10 @@ function TopBar({nav}){
       marginHorizontal: width*0.04,
       paddingTop: 10,
     }}>
-      <Image style={styles.profilPic} source={require("../../../assets/2.jpeg")}/>
+      <TouchableOpacity onPress={() => nav.navigate("Profil")}>
+        <Image style={styles.profilPic} source={require("../../../assets/2.jpeg")}/>
+      </TouchableOpacity>
+      
       <Text style={{fontSize: width>380 ? 20 : 18}}>Hi, </Text>
       <TouchableOpacity onPress={signOut}>
         <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
@@ -247,7 +250,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: CARDSIZE.BUTTONSHAPEWIDTH,
     height: CARDSIZE.BUTTONSHAPEHEIGHT,
-    top: height>700 ? -CARDSIZE.height*0.1 : -CARDSIZE.HEIGHT*0.092,
+    top: height>700 ? -CARDSIZE.HEIGHT*0.1 : -CARDSIZE.HEIGHT*0.092,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 2,

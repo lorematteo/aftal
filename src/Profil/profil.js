@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function ProfilScreen(){
+export default function PremiumScreen(){
     return (
         <View style={styles.Appcontainer}>
-            <Text>Update your profil.</Text>
+            <Text>Update your premium.</Text>
         </View>
     );
 }
