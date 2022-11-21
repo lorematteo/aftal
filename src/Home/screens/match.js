@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: CARDSIZE.BUTTONSHAPEWIDTH,
     height: CARDSIZE.BUTTONSHAPEHEIGHT,
-    top: height>700 ? -CARDSIZE.height*0.1 : -CARDSIZE.HEIGHT*0.092,
+    top: height>700 ? -CARDSIZE.HEIGHT*0.1 : -CARDSIZE.HEIGHT*0.092,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 2,

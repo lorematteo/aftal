@@ -22,4 +22,5 @@ export const Android = StyleSheet.create({
 
 export const COLORS = {
   primary: "#5994EB",
+  gray: "#8A8993",
 };
