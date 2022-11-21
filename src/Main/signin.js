@@ -1,7 +1,7 @@
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
 import { useState } from 'react';
 
-import { COLORS } from '../../utils/constants';
+import { COLORS, width, height } from '../../utils/constants';
 import { handleSignUp, handleSignIn } from '../../utils/firebase';
 
 export default function SignScreen(){
@@ -10,6 +10,7 @@ export default function SignScreen(){
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
+            <Image style={styles.logo} source={require("../../assets/logo.png")}/>
             <View style={styles.inputContainer}>
                 <TextInput placeholder="Email" value={email} onChangeText={text => setEmail(text)} style={styles.input}/>
                 <TextInput placeholder="Password" value={password} onChangeText={text => setPassword(text)} style={styles.input} secureTextEntry/>
@@ -28,17 +29,11 @@ export default function SignScreen(){
 };
 
 const styles = StyleSheet.create({
-    Appcontainer: {
+    container: {
         flex: 1, 
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: COLORS.primary,
-        padding: 30,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
         padding: 30,
     },
     inputContainer: {
@@ -50,6 +45,12 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 10,
         marginTop: 5,
+    },
+    logo: {
+        width: "15%",
+        height: "15%",
+        aspectRatio: 634/722,
+        margin: "10%",
     },
     buttonContainer: {
         width: '60%',

@@ -6,6 +6,7 @@ import Svg, { Path } from 'react-native-svg';
 import { width, height, CARDSIZE, ACTION_OFFSET, Android} from '../../../utils/constants';
 
 import Card from '../components/cardComponent';
+import { signOut } from "../../../utils/firebase";
 
 import { profiles as profilesObj } from '../data';
 
@@ -31,7 +32,10 @@ function TopBar({nav}){
     }}>
       <Image style={styles.profilPic} source={require("../../../assets/2.jpeg")}/>
       <Text style={{fontSize: width>380 ? 20 : 18}}>Hi, </Text>
-      <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
+      <TouchableOpacity onPress={signOut}>
+        <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
+      </TouchableOpacity>
+      
   
       <View style={{flex:1}}></View>
   
@@ -243,7 +247,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: CARDSIZE.BUTTONSHAPEWIDTH,
     height: CARDSIZE.BUTTONSHAPEHEIGHT,
-    top: height>700 ? -CARDSIZE.HEIGHT*0.1 : -CARDSIZE.HEIGHT*0.092,
+    top: height>700 ? -CARDSIZE.height*0.1 : -CARDSIZE.HEIGHT*0.092,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 2,

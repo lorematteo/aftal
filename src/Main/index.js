@@ -9,8 +9,7 @@ import DiscoverScreen from '../Discover/discover';
 import ChatScreen from '../Chat/chat';
 import ProfilScreen from '../Profil/profil';
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const SCREEN_HEIGHT = Dimensions.get("window").height;
+import { width, height} from "../../utils/constants";
 
 const Tab = createBottomTabNavigator();
 
@@ -32,7 +31,7 @@ export default function MainScreen() {
 
           // You can return any component that you like here!
           return (
-            <Ionicons name={iconSrc} size={SCREEN_WIDTH*0.07} color={focused ? "#232323" : "#8A8993"}/>
+            <Ionicons name={iconSrc} size={width*0.07} color={focused ? "#232323" : "#8A8993"}/>
           );
         },
         tabBarActiveTintColor: '#232323',

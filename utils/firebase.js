@@ -22,3 +22,9 @@ export const handleSignIn = async (email, password) => {
             console.log(error);
         });
 }
+
+export const signOut = () => {
+    auth()
+        .signOut()
+        .then(() => console.log('User signed out!'));
+}
