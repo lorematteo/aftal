@@ -1,15 +1,24 @@
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView, Image } from 'react-native';
 import { useState } from 'react';
 import { Ionicons } from "@expo/vector-icons";
+import { CountryPicker } from 'react-native-country-codes-picker';
 
 import { width, height, COLORS, Android } from '../../utils/constants';
 import { handleSignUp, handleSignIn } from '../../utils/firebase';
 
 export default function SignScreen(){
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [phone, setPhone] = useState("")
     const [eyestate, setEyestate] = useState(true);
+
     const [mailselected, setMailselected] = useState(true);
+
+    const [showcountry, setShowcountry] = useState(false);
+    const [countryCode, setCountryCode] = useState("+33");
+    const [countryName, setCountryName] = useState("France");
+    const [countryFlag, setCountryFlag] = useState("🇫🇷");
 
     return (
         <SafeAreaView style={[styles.container, Android.SafeArea]}>
@@ -39,6 +48,8 @@ export default function SignScreen(){
                     </TouchableOpacity>
                 </View>
 
+                {mailselected ? 
+
                 <View style={styles.inputPanel}>
                     <View style={styles.inputContainer}>
                         <TextInput autoCorrect={false} placeholder="Email" value={email} onChangeText={text => setEmail(text)} style={styles.input}/>
@@ -59,10 +70,33 @@ export default function SignScreen(){
                         </TouchableOpacity>         
                     </View>
                 </View>
+            
+                : 
+                
+                <View style={styles.inputPanel}>
+                    <TouchableOpacity style={styles.inputContainer} onPress={() => setShowcountry(true)}>
+                        <Text style={{marginLeft: 30, marginRight: 15, marginVertical: 15}}>{countryFlag}</Text>
+                        <Text>{countryName}</Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.inputContainer}>
+                        <Text style={{marginHorizontal: 25}}>{countryCode}</Text>
+                        <View style={{width: 1, height: 20, backgroundColor: COLORS.gray}}/>
+                        <TextInput autoCorrect={false} placeholder="Phone number" keyboardType={"number-pad"} maxLength={13}  onChangeText={text => setPhone(text)} style={styles.input}/>
+                    </View>
+                    <View style={{alignItems: 'flex-end', paddingRight: 20, paddingTop: 10, opacity: 0}}>
+                        <TouchableOpacity onPress={() => {}}>
+                            <Text style={{right: 0,}}>Forgot Password?</Text>
+                        </TouchableOpacity>         
+                    </View>
+                </View>
+                }
+
             </View>
+                
 
             <TouchableOpacity style={styles.loginButton} onPress={() => {handleSignIn(email, password)}}>
-                <Text style={{color: "white"}}>Login</Text>
+                <Text style={{color: "white", fontWeight: "700"}}>Login</Text>
             </TouchableOpacity>   
             
             <View>
@@ -86,11 +120,26 @@ export default function SignScreen(){
                 <View style={{flexDirection: "row", justifyContent: "center"}}>
                     <Text style={{color: COLORS.gray}}>Don't have an account ?</Text>
                     <TouchableOpacity>
-                        <Text style={{color: COLORS.primary, fontWeight: "bold"}}>Sign up</Text>
+                        <Text style={{color: COLORS.primary, fontWeight: "bold", marginLeft: 10}}>Sign up</Text>
                     </TouchableOpacity>
                 </View>
 
             </View>
+
+            <CountryPicker
+                show={showcountry}
+                inputPlaceholder={"Entrez votre pays"}
+                searchMessage={"Désolé, nous ne trouvons pas votre pays 😔"}
+                lang="fr"
+                enableModalAvoiding={true}
+                // when picker button press you will get the country object with dial code
+                pickerButtonOnPress={(item) => {
+                setCountryCode(item.dial_code);
+                setCountryName(item.name["fr"]);
+                setCountryFlag(item.flag);
+                setShowcountry(false);
+                }}
+            />
             
         </SafeAreaView>
     );
