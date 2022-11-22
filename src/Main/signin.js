@@ -1,58 +1,53 @@
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
+import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView, Image } from 'react-native';
 import { useState } from 'react';
 import { Ionicons } from "@expo/vector-icons";
 
-import { width, height, COLORS } from '../../utils/constants';
+import { width, height, COLORS, Android } from '../../utils/constants';
 import { handleSignUp, handleSignIn } from '../../utils/firebase';
 
 export default function SignScreen(){
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [eyestate, setEyestate] = useState(true)
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [eyestate, setEyestate] = useState(true);
+    const [mailselected, setMailselected] = useState(true);
 
     return (
-       /* <KeyboardAvoidingView style={styles.container} behavior="padding">
-            <Image style={styles.logo} source={require("../../assets/logo.png")}/>
-            <View style={styles.inputContainer}>
-                <TextInput placeholder="Email" value={email} onChangeText={text => setEmail(text)} style={styles.input}/>
-                <TextInput placeholder="Password" value={password} onChangeText={text => setPassword(text)} style={styles.input} secureTextEntry/>
-            </View>
-
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={() => {handleSignIn(email, password)}} style={styles.button}>
-                    <Text style={styles.buttonText}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => {handleSignUp(email, password)}} style={[styles.button, styles.buttonOutLine]}>
-                    <Text style={styles.buttonOutLineText}>Register</Text>
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>*/
-        <View style={styles.container}>
+        <SafeAreaView style={[styles.container, Android.SafeArea]}>
 
             <View>
-                <Text style={styles.text}>Welcome Back 👋</Text>
-                <Text style={styles.subtext}>We happy to see you again. To use your account, you should log in first.</Text>
+                <Text style={{
+                    fontSize: 23,
+                    color: COLORS.primary,
+                    fontWeight: "bold",
+                    paddingTop: (width/100)*8,
+                }}>Welcome Back 👋</Text>
+                <Text style={{
+                    paddingTop: (width/100)*4,
+                    fontSize: 14,
+                    color: "black",
+                }}>We happy to see you again. To use your account, you should log in first.</Text>
             </View>
 
-            <View style={styles.box2}>
-                <View style={styles.subbox2}>
-                    <TouchableOpacity onPress={() => {}} style={styles.bl}>
-                        <Text style={{}}>Email</Text>
+            <View>
+
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity onPress={() => {setMailselected(true)}} style={mailselected ? styles.buttonSelected : styles.button}>
+                        <Text>Email</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => {}} style={styles.br}>
+                    <TouchableOpacity onPress={() => {setMailselected(false)}} style={mailselected ? styles.button : styles.buttonSelected}>
                         <Text>Phone number</Text>
                     </TouchableOpacity>
                 </View>
 
-                <View>
-                    <View style={styles.subbox22}>
+                <View style={styles.inputPanel}>
+                    <View style={styles.inputContainer}>
                         <TextInput autoCorrect={false} placeholder="Email" value={email} onChangeText={text => setEmail(text)} style={styles.input}/>
                         <TouchableOpacity onPress={() => setEmail("")} style={{paddingLeft: 0,}}>
                             <Ionicons style={styles.iconcroix} color={COLORS.gray} name="close-circle-outline" size={width>380 ? 25 : 23}/>
                         </TouchableOpacity>
                     </View>
 
-                    <View style={styles.subbox23}>
+                    <View style={styles.inputContainer}>
                         <TextInput autoCorrect={false} placeholder="Password" value={password} onChangeText={text => setPassword(text)} style={styles.input} secureTextEntry={eyestate}/>
                         <TouchableOpacity onPress={() => setEyestate(!eyestate)} style={styles.iconcroix}>
                             <Ionicons color={COLORS.gray} name={eyestate ? "eye-off-outline" : "eye-outline"} size={width>380 ? 25 : 23}/>
@@ -66,13 +61,38 @@ export default function SignScreen(){
                 </View>
             </View>
 
-            <View style={styles.box3}>
-                <TouchableOpacity style={styles.login} onPress={() => {handleSignIn(email, password)}}>
-                    <Text style={{color: "white"}}>Login</Text>
-                </TouchableOpacity>   
-            </View>
+            <TouchableOpacity style={styles.loginButton} onPress={() => {handleSignIn(email, password)}}>
+                <Text style={{color: "white"}}>Login</Text>
+            </TouchableOpacity>   
+            
+            <View>
+                <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <View style={{flex: 1, height: 1, backgroundColor: COLORS.gray, opacity: 0.3}}/>
+                    <Text style={{color: COLORS.gray, marginHorizontal: 10}}>Sign in with Google or Facebook</Text>
+                    <View style={{flex: 1, height: 1, backgroundColor: COLORS.gray, opacity: 0.3}}/>
+                </View>
 
-        </View>
+                <View style={{flexDirection: "row", paddingVertical: 20}}>
+                    <TouchableOpacity style={[styles.socialButton, {marginRight: 5}]}>
+                        <Image source={require("../../assets/facebook.png")} style={{width: 25, height: 25, marginRight: 10}}/>
+                        <Text style={{color: COLORS.gray}}>Facebook</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.socialButton, {marginLeft: 5}]}>
+                        <Image source={require("../../assets/google.png")} style={{width: 25, height: 25, marginRight: 10}}/>
+                        <Text style={{color: COLORS.gray}}>Google</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={{flexDirection: "row", justifyContent: "center"}}>
+                    <Text style={{color: COLORS.gray}}>Don't have an account ?</Text>
+                    <TouchableOpacity>
+                        <Text style={{color: COLORS.primary, fontWeight: "bold"}}>Sign up</Text>
+                    </TouchableOpacity>
+                </View>
+
+            </View>
+            
+        </SafeAreaView>
     );
 };
 
@@ -80,101 +100,64 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: "column",
-        //padding: 25,
-        padding: (width/100)*5,
+        margin: 20,
+        justifyContent: "space-between",
     },
-    box2: {
-        flexDirection: "column",
-        //padding: 25,
-        paddingTop: (width/100)*14,
-    },
-    box3: {
-        flexDirection: "column",
-        marginTop: 25,
-        height: height*0.07,
-        //paddingBottom: height*0.05,
-    },
-    subbox2: {
+    buttonContainer: {
         backgroundColor: "#F3F6FF",
-        //flex: 1,
         flexDirection: "row",
-        //padding: 25,
-        paddingVertical: (width/100)*2,
         justifyContent: "space-around",
-        height: (height/100)*5 + (width/100)*4,
-        borderRadius: 10,
-    },
-    subbox22: {
-        backgroundColor: "#F3F6FF",
-        //paddingVertical: 15,
-        borderRadius: 10,
-        marginTop: height*0.04,
-        //heigh: height*0.5,
-        flexDirection: "row",
         alignItems: "center",
+        borderRadius: 15,
+        marginVertical: 30,
     },
-    subbox23: {
-        backgroundColor: "#F3F6FF",
-        //paddingVertical: 15,
+    button: {
+        width: width*0.4,
+        height: width*0.12,
         borderRadius: 10,
-        marginTop: height*0.025,
-        //heigh: height*0.5,
-        flexDirection: "row",
         alignItems: "center",
+        justifyContent: "center",
+        margin: 10
     },
-    text: {
-        fontSize: 23,
-        color: COLORS.primary,
-        fontWeight: "bold",
-        //paddingTop: 25,
-        paddingTop: (width/100)*8,
-    },
-    subtext: {
-        paddingTop: (width/100)*4,
-        fontSize: 14,
-        color: "black",
-    },
-    bl: {
-        //marginLeft: (width/100)*2,
-        //marginRight: (width/100)*1,
+    buttonSelected: {
         backgroundColor: "#FFFFFF",
-        width: (width/100)*42,
-        height: (height/100)*5,
+        width: width*0.4,
+        height: width*0.12,
         borderRadius: 10,
         alignItems: "center",
         justifyContent: "center",
+        margin: 10
     },
-    br: {
-        //marginRight: (width/100)*2,
-        //marginLeft: (width/100)*1,
-        width: (width/100)*42,
-        height: (height/100)*5,
+    inputContainer: {
+        backgroundColor: "#F3F6FF",
         borderRadius: 10,
+        flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center",
+        marginVertical: 5,
     },
     input: {
-        //marginRight: (width/100)*2,
-        //marginLeft: (width/100)*1,
-        backgroundColor: "#F3F6FF",
         paddingVertical: 15,
         paddingRight: 20,
-        borderRadius: 10,
         width: width*0.8,
         paddingLeft: 20,
-        //marginHorizontal: (width/100)*2,
-        //marginVertical: height*0.05,
     },
-    iconcroix: {
-        paddingLeft: 5,
-    },
-    login: {
-        flex: 1,
+    loginButton: {
+        height: height*0.07,
         backgroundColor: COLORS.primary,
         fontSize: 14,
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 10,
-        //height: height*0.1,
+        marginVertical: 25,
     },
+    socialButton: {
+        flex: 1,
+        flexDirection: "row",
+        borderWidth: 1,
+        borderColor: COLORS.primary,
+        borderRadius: 15,
+        padding: width*0.05,
+        alignItems: "center",
+        justifyContent: "center",
+    }
 });
