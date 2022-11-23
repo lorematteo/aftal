@@ -1,12 +1,12 @@
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView, Image } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView, Image } from 'react-native';
 import { useState } from 'react';
 import { Ionicons } from "@expo/vector-icons";
 import { CountryPicker } from 'react-native-country-codes-picker';
 
-import { width, height, COLORS, Android } from '../../utils/constants';
-import { handleSignUp, handleSignIn, onGoogleButtonPress } from '../../utils/firebase';
+import { width, height, COLORS, Android } from '../../../utils/constants';
+import { handleSignIn, onGoogleButtonPress } from '../../../utils/firebase';
 
-export default function SignScreen(){
+export default function SignInScreen({ navigation }){
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -21,9 +21,9 @@ export default function SignScreen(){
     const [countryFlag, setCountryFlag] = useState("🇫🇷");
 
     return (
-        <SafeAreaView style={[styles.container, Android.SafeArea]}>
-
-            <View>
+        <SafeAreaView style={[Android.SafeArea, {flex: 1, backgroundColor: "white"}]}>
+            <View style={styles.container}>
+                <View>
                 <Text style={{
                     fontSize: 23,
                     color: COLORS.primary,
@@ -93,13 +93,13 @@ export default function SignScreen(){
                 }
 
             </View>
-                
-
-            <TouchableOpacity style={styles.loginButton} onPress={() => {handleSignIn(email, password)}}>
-                <Text style={{color: "white", fontWeight: "700"}}>Login</Text>
-            </TouchableOpacity>   
             
             <View>
+
+                <TouchableOpacity style={styles.loginButton} onPress={() => {handleSignIn(email, password)}}>
+                    <Text style={{color: "white", fontWeight: "700"}}>Login</Text>
+                </TouchableOpacity>
+
                 <View style={{flexDirection: "row", alignItems: "center"}}>
                     <View style={{flex: 1, height: 1, backgroundColor: COLORS.gray, opacity: 0.3}}/>
                     <Text style={{color: COLORS.gray, marginHorizontal: 10}}>Sign in with Google or Facebook</Text>
@@ -108,18 +108,18 @@ export default function SignScreen(){
 
                 <View style={{flexDirection: "row", paddingVertical: 20}}>
                     <TouchableOpacity style={[styles.socialButton, {marginRight: 5}]}>
-                        <Image source={require("../../assets/facebook.png")} style={{width: 25, height: 25, marginRight: 10}}/>
+                        <Image source={require("../../../assets/facebook.png")} style={{width: 25, height: 25, marginRight: 10}}/>
                         <Text style={{color: COLORS.gray}}>Facebook</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.socialButton, {marginLeft: 5}]} onPress={() => onGoogleButtonPress().then(() => console.log('Signed in with Google!'))}>
-                        <Image source={require("../../assets/google.png")} style={{width: 25, height: 25, marginRight: 10}}/>
+                        <Image source={require("../../../assets/google.png")} style={{width: 25, height: 25, marginRight: 10}}/>
                         <Text style={{color: COLORS.gray}}>Google</Text>
                     </TouchableOpacity>
                 </View>
 
                 <View style={{flexDirection: "row", justifyContent: "center"}}>
                     <Text style={{color: COLORS.gray}}>Don't have an account ?</Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("SignUpMail")}>
                         <Text style={{color: COLORS.primary, fontWeight: "bold", marginLeft: 10}}>Sign up</Text>
                     </TouchableOpacity>
                 </View>
@@ -140,7 +140,7 @@ export default function SignScreen(){
                 setShowcountry(false);
                 }}
             />
-            
+            </View> 
         </SafeAreaView>
     );
 };
@@ -148,8 +148,7 @@ export default function SignScreen(){
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: "column",
-        margin: 20,
+        padding: 20,
         justifyContent: "space-between",
     },
     buttonContainer: {
@@ -198,6 +197,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: 10,
         marginVertical: 25,
+        marginBottom: height*0.05,
     },
     socialButton: {
         flex: 1,

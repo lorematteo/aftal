@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import auth from '@react-native-firebase/auth';
 
 import MainScreen from "./src/Main/index";
-import SignScreen from "./src/Main/signin";
+import SignScreen from "./src/Sign/sign";
 
 export default function App() {
   // Set an initializing state whilst Firebase connects

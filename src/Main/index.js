@@ -1,53 +1,32 @@
-import { StyleSheet, Dimensions } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { Ionicons } from '@expo/vector-icons';
+import HomeTabs from "../Home/home"
+import FilterScreen from "../Home/screens/filter";
+import NotifScreen from "../Home/screens/notif";
+import ProfilScreen from "../Home/screens/profil";
 
-import HomeScreenStack from '../Home/home';
-import DiscoverScreen from '../Discover/discover';
-import ChatScreen from '../Chat/chat';
-import PremiumScreen from '../Profil/profil';
-
-import { width, height, COLORS} from "../../utils/constants";
-
-const Tab = createBottomTabNavigator();
+const HomeStack = createNativeStackNavigator();
 
 export default function MainScreen() {
   return (
     <NavigationContainer>
-      <Tab.Navigator initialRouteName="Home" screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconSrc;
-          if (route.name === "Home"){
-            iconSrc = "copy";
-          } else if (route.name === "Discover"){
-            iconSrc = "compass";
-          } else if (route.name === "Chat"){
-            iconSrc = "chatbubbles"
-          } else if (route.name === "Premium"){
-            iconSrc = "star"
-          }
+      <HomeStack.Navigator screenOptions={{ headerShown: false }}>
 
-          // You can return any component that you like here!
-          return (
-            <Ionicons name={iconSrc} size={width*0.07} color={focused ? "#232323" : "#8A8993"}/>
-          );
-        },
-        tabBarActiveTintColor: '#232323',
-        tabBarInactiveTintColor: COLORS.gray,
-        tabBarStyle: {borderTopWidth: 0, elevation: 0},
-        headerShown: false,
-        tabBarShowLabel: false,
-      })}>
-        <Tab.Screen name="Home" component={HomeScreenStack}/>
-        <Tab.Screen name="Discover" component={DiscoverScreen}/>
-        <Tab.Screen name="Chat" component={ChatScreen}/>
-        <Tab.Screen name="Premium" component={PremiumScreen}/>
-      </Tab.Navigator>
+        <HomeStack.Group>
+          <HomeStack.Screen name="Match" component={HomeTabs} />
+          <HomeStack.Screen name="Filter" component={FilterScreen} />
+          <HomeStack.Screen name="Notif" component={NotifScreen} />
+          <HomeStack.Screen name="Profil" component={ProfilScreen} options={{animation: "slide_from_bottom"}}/>
+        </HomeStack.Group>
+
+        <HomeStack.Group>
+          
+        </HomeStack.Group>
+
+        
+      </HomeStack.Navigator>
     </NavigationContainer>
+    
   );
 }
-
-const styles = StyleSheet.create({
-});
