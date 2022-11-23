@@ -20,19 +20,22 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lorematteo.aftal"
+      "bundleIdentifier": "com.lorematteo.aftal",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.lorematteo.aftal"
+      "package": "com.lorematteo.aftal",
+      "googleServicesFile": "./google-services.json"
     },
     "extra": {
       "eas": {
         "projectId": "92b545b5-fdcf-4ed2-85c2-7f5cbf04169b"
       }
-    }
+    },
+    "plugins": ["@react-native-google-signin/google-signin"]
   }
 }

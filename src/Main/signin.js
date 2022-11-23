@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { CountryPicker } from 'react-native-country-codes-picker';
 
 import { width, height, COLORS, Android } from '../../utils/constants';
-import { handleSignUp, handleSignIn } from '../../utils/firebase';
+import { handleSignUp, handleSignIn, onGoogleButtonPress } from '../../utils/firebase';
 
 export default function SignScreen(){
 
@@ -111,7 +111,7 @@ export default function SignScreen(){
                         <Image source={require("../../assets/facebook.png")} style={{width: 25, height: 25, marginRight: 10}}/>
                         <Text style={{color: COLORS.gray}}>Facebook</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.socialButton, {marginLeft: 5}]}>
+                    <TouchableOpacity style={[styles.socialButton, {marginLeft: 5}]} onPress={() => onGoogleButtonPress().then(() => console.log('Signed in with Google!'))}>
                         <Image source={require("../../assets/google.png")} style={{width: 25, height: 25, marginRight: 10}}/>
                         <Text style={{color: COLORS.gray}}>Google</Text>
                     </TouchableOpacity>
