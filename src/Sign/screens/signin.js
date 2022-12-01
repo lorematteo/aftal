@@ -1,12 +1,19 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView, Image } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView, Image, LogBox } from 'react-native';
 import { useState } from 'react';
 import { Ionicons } from "@expo/vector-icons";
 import { CountryPicker } from 'react-native-country-codes-picker';
 
 import { width, height, COLORS, Android } from '../../../utils/constants';
 import { handleSignIn, onGoogleButtonPress } from '../../../utils/firebase';
+import { useRoute } from '@react-navigation/native';
+
+LogBox.ignoreLogs([
+    'Non-serializable values were found in the navigation state',
+]);
 
 export default function SignInScreen({ navigation }){
+
+    const route = useRoute();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -96,7 +103,7 @@ export default function SignInScreen({ navigation }){
             
             <View>
 
-                <TouchableOpacity style={styles.loginButton} onPress={() => {handleSignIn(email, password)}}>
+                <TouchableOpacity style={styles.loginButton} onPress={() => {handleSignIn(email, password, route.params.setDisconnected)}}>
                     <Text style={{color: "white", fontWeight: "700"}}>Login</Text>
                 </TouchableOpacity>
 

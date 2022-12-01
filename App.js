@@ -9,9 +9,15 @@ export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
+  // Check if user open screen on SignScreen or not
+  const [disconnected, setDisconnected] = useState(false)
+
   // Handle user state changes
   function onAuthStateChanged(user) {
     setUser(user);
+    if(!user){
+      setDisconnected(true);
+    }
     if (initializing) setInitializing(false);
   }
 
@@ -22,9 +28,9 @@ export default function App() {
 
   if (initializing) return null;
 
-  if (!user) {
+  if (disconnected) {
     return (
-      <SignScreen/>
+      <SignScreen setDisconnected={setDisconnected}/>
     );
   }
 

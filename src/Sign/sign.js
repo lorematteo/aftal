@@ -6,13 +6,13 @@ import SignUpMail from './screens/signup';
 
 const SignStack = createNativeStackNavigator();
 
-export default function SignScreen() {
+export default function SignScreen({setDisconnected}) {
   return (
     <NavigationContainer>
       <SignStack.Navigator initialRouteName="SignIn" screenOptions={{ headerShown: false }}>
 
-        <SignStack.Screen name="SignIn" component={SignInScreen}/>
-        <SignStack.Screen name="SignUpMail" component={SignUpMail}/>
+        <SignStack.Screen name="SignIn" component={SignInScreen} initialParams={{setDisconnected: setDisconnected}}/>
+        <SignStack.Screen name="SignUpMail" component={SignUpMail} initialParams={{setDisconnected: setDisconnected}}/>
         
       </SignStack.Navigator>
     </NavigationContainer>

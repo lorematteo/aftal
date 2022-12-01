@@ -54,6 +54,10 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Nous avons besoin de l'accès à votre librairie.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Nous avons besoin de votre caméra.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>SplashScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

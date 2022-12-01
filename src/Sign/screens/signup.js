@@ -1,9 +1,20 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Image, SafeAreaView } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, Image, SafeAreaView, LogBox, ActivityIndicator } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
 import { Ionicons } from "@expo/vector-icons";
-import { width, height, COLORS, Android } from '../../../utils/constants';
+import ImagePicker from 'react-native-image-crop-picker';
+import ActionSheet from 'react-native-actionsheet';
+import LottieView from 'lottie-react-native';
 
+import { width, height, COLORS, Android } from '../../../utils/constants';
 import { SocialBox } from "../components/socials";
+import { handleSignUp } from "../../../utils/firebase";
+
+import defaultProfilPic from "../../../assets/defaultprofilpic.jpeg"
+import { useRoute } from '@react-navigation/native';
+
+LogBox.ignoreLogs([
+    'Non-serializable values were found in the navigation state',
+]);
 
 function convertHex(hexCode, opacity = 1){
     var hex = hexCode.replace('#', '');
@@ -26,9 +37,17 @@ function convertHex(hexCode, opacity = 1){
 
 export default function SignUpMail({ navigation }){
 
+    const route = useRoute();
+
+    const defaultUri = Image.resolveAssetSource(defaultProfilPic).uri
+
     const [email, setEmail] = useState("");
-    const [step, setStep] = useState(0);
     const [name, setName] = useState("");
+    const [password, setPassword] = useState("");
+    const [picture, setPicture] = useState(defaultUri);
+
+    const [loading, setloading] = useState(false)
+    const [step, setStep] = useState(0);
 
     return (
         <SafeAreaView style={[Android.SafeArea, {flex: 1, backgroundColor: "white"}]}>
@@ -40,12 +59,33 @@ export default function SignUpMail({ navigation }){
                     (step==1) ? 
                         <SetNameScreen setStep={setStep} name={name} setName={setName}/>
                     :
-                        <SetProfilPicScreen setStep={setStep}/>
+                        (step==2) ?
+                            <SetProfilPicScreen setStep={setStep} picture={picture} setPicture={setPicture}/>
+                        :
+                            (step==3) ?
+                                <SetPasswordScreen setStep={setStep} password={password} setPassword={setPassword}/>
+                            :
+
+                                <CompleteScreen/>
                 }
 
                 <View>
-                    <TouchableOpacity style={styles.loginButton} onPress={() => setStep(step+1)}>
-                        <Text style={{color: "white", fontWeight: "700"}}>Next</Text>
+                    <TouchableOpacity style={styles.loginButton} onPress={async () => {
+                        if(step<3){
+                            setStep(step+1);
+                        } else {
+                            if(step==3){
+                                handleSignUp(email, password, name, picture, setloading, step, setStep);
+                            } else {
+                                route.params.setDisconnected(false);
+                            }
+                        }
+                    }}>
+                        {(loading) ? 
+                            <ActivityIndicator size="small" color="white"/>
+                        : 
+                            <Text style={{color: "white", fontWeight: "700"}}>{(step>=4) ? "Start !" : "Next"}</Text>
+                        }
                     </TouchableOpacity>  
 
                     {(step==0) ? <SocialBox/> : null}
@@ -108,7 +148,7 @@ function SetNameScreen({setStep, name, setName}){
                 borderRadius: 15,
                 borderColor: convertHex(COLORS.primary),
                 borderWidth: 1,
-                }} onPress={() => setStep(0)}>
+                }} onPress={() => setStep(step-1)}>
                 <Ionicons name={"chevron-back-outline"} size={25} color={COLORS.primary}/>
             </TouchableOpacity>
 
@@ -137,7 +177,35 @@ function SetNameScreen({setStep, name, setName}){
     )
 }
 
-function SetProfilPicScreen({setStep}){
+function SetProfilPicScreen({setStep, picture, setPicture}){
+
+    let actionSheet = useRef();
+
+    const ChoosePhotoFromLibrary = () => {
+        ImagePicker.openPicker({
+            width: 300,
+            height: 400,
+            cropping: true,
+            cropperCircleOverlay: true,
+          }).then(image => {
+            //console.log(image);
+            setPicture(image.path);
+          });
+    };
+
+    const TakePhotoFromCamera = () => {
+        ImagePicker.openCamera({
+            width: 300,
+            height: 400,
+            cropping: true,
+            cropperCircleOverlay: true,
+            useFrontCamera: true,
+          }).then(image => {
+            //console.log(image);
+            setPicture(image.path);
+          });
+    }
+
     return (
         <View style={{flex: 1}}>
 
@@ -149,7 +217,7 @@ function SetProfilPicScreen({setStep}){
                 borderRadius: 15,
                 borderColor: convertHex(COLORS.primary),
                 borderWidth: 1,
-                }} onPress={() => setStep(1)}>
+                }} onPress={() => setStep(step-1)}>
                 <Ionicons name={"chevron-back-outline"} size={25} color={COLORS.primary}/>
             </TouchableOpacity>
 
@@ -177,9 +245,10 @@ function SetProfilPicScreen({setStep}){
                             height: width*0.45,
                             borderRadius: 95,
                             margin: 2,
-                            }} source={require("../../../assets/2.jpeg")}/>
+                            }} source={{uri: picture}}/>
                     </View>
-                    <View style={{
+                    <TouchableOpacity onPress={() => actionSheet.current.show()}>
+                        <View style={{
                         backgroundColor: "#F2F6FF",
                         position: "absolute",
                         bottom: 0,
@@ -189,17 +258,121 @@ function SetProfilPicScreen({setStep}){
                         alignItems: "center",
                         justifyContent: "center",
                         borderRadius: 95,
-                    }}>
-                        <Ionicons name="trash-outline" size={width*0.07} color={COLORS.primary}/>
-                    </View>
+                        }}>
+                            <Ionicons name="download-outline" size={width*0.07} color={COLORS.primary}/>
+                        </View>
+                    </TouchableOpacity>
+                    
                 </View>
-                
+            </View>
+            <ActionSheet
+            ref={actionSheet}
+            title={"Comment souhaitez vous importer votre photo ?"}
+            options={["Prendre une photo","Choisir dans la galerie","Annuler"]}
+            cancelButtonIndex={2}
+            onPress={(index) => {
+                if(index==0){
+                    TakePhotoFromCamera()
+                } if(index==1){
+                    ChoosePhotoFromLibrary()
+                }
+            }}
+            />
+        </View>
+    )
+}
+
+function SetPasswordScreen({setStep, password, setPassword}){
+
+    const [eyestate, setEyestate] = useState(true);
+    const [cpass, setCpass] = useState("");
+
+    return (
+        <View style={{flex: 1}}>
+
+            <TouchableOpacity style={{
+                width: 40,
+                height: 40,
+                alignItems: "center",
+                justifyContent: "center", 
+                borderRadius: 15,
+                borderColor: convertHex(COLORS.primary),
+                borderWidth: 1,
+                }} onPress={() => setStep(step-1)}>
+                <Ionicons name={"chevron-back-outline"} size={25} color={COLORS.primary}/>
+            </TouchableOpacity>
+
+            <Text style={{
+                fontSize: 23,
+                color: COLORS.primary,
+                fontWeight: "bold",
+                paddingTop: (width/100)*8,
+            }}>
+                Choose a password.
+            </Text>
+            <Text style={{
+                paddingTop: (width/100)*4,
+                fontSize: 14,
+                color: "black",
+            }}>
+                Add a strong password to continue.
+            </Text>
+
+            <View style={styles.inputContainer}>
+                        <TextInput autoCorrect={false} placeholder="Password" value={password} onChangeText={text => setPassword(text)} style={styles.input} secureTextEntry={eyestate}/>
+                        <TouchableOpacity onPress={() => setEyestate(!eyestate)} style={styles.iconcroix}>
+                            <Ionicons color={COLORS.gray} name={eyestate ? "eye-off-outline" : "eye-outline"} size={width>380 ? 25 : 23}/>
+                        </TouchableOpacity>
+            </View>
+            <View style={styles.inputContainer}>
+                        <TextInput autoCorrect={false} placeholder="Confirm password" value={cpass} onChangeText={text => setCpass(text)} style={styles.input} secureTextEntry={true}/>
+                        <Ionicons color={(password == cpass && cpass!="") ? COLORS.primary : COLORS.gray} name={(password == cpass && cpass!="") ? "checkmark-circle-outline" : "close-circle-outline"} size={width>380 ? 25 : 23}/>
             </View>
         </View>
     )
 }
 
+function CompleteScreen(){
 
+    const animation = useRef(null);
+    useEffect(() => {
+        // You can control the ref programmatically, rather than using autoPlay
+        // animation.current?.play();
+    }, []);
+
+    return (
+        <View>
+            <Text style={{
+                fontSize: 23,
+                color: COLORS.primary,
+                fontWeight: "bold",
+                paddingTop: (width/100)*8,
+            }}>
+                Account created ! 👌
+            </Text>
+            <Text style={{
+                paddingTop: (width/100)*4,
+                fontSize: 14,
+                color: "black",
+            }}>
+                You can start using the app.
+            </Text>
+            <View style={{flexDirection: "row", justifyContent: "center", marginTop: height*0.15}}>
+                <LottieView
+                    autoPlay
+                    ref={animation}
+                    style={{
+                    width: 250,
+                    height: 250,
+                    }}
+                    source={require("../../../assets/lotties/singing-and-playing.json")}
+                />
+            </View>
+            
+            
+        </View>
+    )
+}
 
 const styles = StyleSheet.create({
     container: {
