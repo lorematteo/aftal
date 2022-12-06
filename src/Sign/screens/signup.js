@@ -44,10 +44,16 @@ export default function SignUpMail({ navigation }){
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
+    const [cpass, setCpass] = useState("");
     const [picture, setPicture] = useState(defaultUri);
 
     const [loading, setloading] = useState(false)
     const [step, setStep] = useState(0);
+
+    const validateEmail = (email) => {
+        const expression = /(?!.*\.{2})^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([\t]*\r\n)?[\t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([\t]*\r\n)?[\t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+        return expression.test(String(email).toLowerCase())
+    }
 
     return (
         <SafeAreaView style={[Android.SafeArea, {flex: 1, backgroundColor: "white"}]}>
@@ -57,28 +63,38 @@ export default function SignUpMail({ navigation }){
                     <SetMailScreen email={email} setEmail={setEmail}/>
                 :
                     (step==1) ? 
-                        <SetNameScreen setStep={setStep} name={name} setName={setName}/>
+                        <SetNameScreen step={step} setStep={setStep} name={name} setName={setName}/>
                     :
                         (step==2) ?
-                            <SetProfilPicScreen setStep={setStep} picture={picture} setPicture={setPicture}/>
+                            <SetProfilPicScreen step={step} setStep={setStep} picture={picture} setPicture={setPicture}/>
                         :
                             (step==3) ?
-                                <SetPasswordScreen setStep={setStep} password={password} setPassword={setPassword}/>
+                                <SetPasswordScreen step={step} setStep={setStep} password={password} setPassword={setPassword} cpass={cpass} setCpass={setCpass}/>
                             :
 
                                 <CompleteScreen/>
                 }
 
                 <View>
-                    <TouchableOpacity style={styles.loginButton} onPress={async () => {
-                        if(step<3){
+                    <TouchableOpacity style={styles.loginButton} disabled={
+                        loading || (step==0 && email=="") || 
+                        (step==1 && name.length<2) || (step==2 && picture==defaultUri) || (step==3 && (password!=cpass || password==""))
+                    }
+                        onPress={async () => {
+                        if(step==0 && validateEmail(email)){
                             setStep(step+1);
-                        } else {
-                            if(step==3){
-                                handleSignUp(email, password, name, picture, setloading, step, setStep);
-                            } else {
-                                route.params.setDisconnected(false);
-                            }
+                        }
+                        if(step==1 && (name.length>2)){
+                            setStep(step+1);
+                        }
+                        if(step==2 && picture!=defaultUri){
+                            setStep(step+1);
+                        }
+                        if(step==3 && password!="" && password==cpass){
+                            handleSignUp(email, password, name, picture, setloading, step, setStep);
+                        }
+                        if(step==4){
+                            route.params.setDisconnected(false);
                         }
                     }}>
                         {(loading) ? 
@@ -88,7 +104,7 @@ export default function SignUpMail({ navigation }){
                         }
                     </TouchableOpacity>  
 
-                    {(step==0) ? <SocialBox/> : null}
+                    {(step==0) ? <SocialBox setDisconnected={route.params.setDisconnected}/> : null}
                     
                     {(step==0) ? 
                     <View style={{flexDirection: "row", justifyContent: "center"}}>
@@ -126,7 +142,7 @@ function SetMailScreen({ email, setEmail}){
 
             <View style={styles.inputPanel}>
                 <View style={styles.inputContainer}>
-                    <TextInput autoCorrect={false} placeholder="Email" value={email} onChangeText={text => setEmail(text)} style={styles.input}/>
+                    <TextInput autoCorrect={false} placeholder="Email" value={email} onChangeText={text => setEmail(text.toLowerCase())} style={styles.input}/>
                     <TouchableOpacity onPress={() => setEmail("")} style={{paddingLeft: 0,}}>
                         <Ionicons style={styles.iconcroix} color={COLORS.gray} name="close-circle-outline" size={width>380 ? 25 : 23}/>
                     </TouchableOpacity>
@@ -136,7 +152,7 @@ function SetMailScreen({ email, setEmail}){
     )
 }
 
-function SetNameScreen({setStep, name, setName}){
+function SetNameScreen({step, setStep, name, setName}){
     return (
         <View style={{flex: 1}}>
 
@@ -177,7 +193,7 @@ function SetNameScreen({setStep, name, setName}){
     )
 }
 
-function SetProfilPicScreen({setStep, picture, setPicture}){
+function SetProfilPicScreen({step, setStep, picture, setPicture}){
 
     let actionSheet = useRef();
 
@@ -282,10 +298,9 @@ function SetProfilPicScreen({setStep, picture, setPicture}){
     )
 }
 
-function SetPasswordScreen({setStep, password, setPassword}){
+function SetPasswordScreen({step, setStep, password, setPassword, cpass, setCpass}){
 
     const [eyestate, setEyestate] = useState(true);
-    const [cpass, setCpass] = useState("");
 
     return (
         <View style={{flex: 1}}>
@@ -326,7 +341,7 @@ function SetPasswordScreen({setStep, password, setPassword}){
             </View>
             <View style={styles.inputContainer}>
                         <TextInput autoCorrect={false} placeholder="Confirm password" value={cpass} onChangeText={text => setCpass(text)} style={styles.input} secureTextEntry={true}/>
-                        <Ionicons color={(password == cpass && cpass!="") ? COLORS.primary : COLORS.gray} name={(password == cpass && cpass!="") ? "checkmark-circle-outline" : "close-circle-outline"} size={width>380 ? 25 : 23}/>
+                        <Ionicons color={(password == cpass && cpass!="") ? COLORS.primary : COLORS.gray} name={(password == cpass && cpass!="") ? "checkmark-circle-outline" : ""} size={width>380 ? 25 : 23}/>
             </View>
         </View>
     )

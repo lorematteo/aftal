@@ -2,8 +2,12 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { onGoogleButtonPress } from '../../../utils/firebase';
 
 import { width, COLORS } from '../../../utils/constants';
+import { useState } from 'react';
 
-export function SocialBox(){
+export function SocialBox({setDisconnected}){
+
+    const [loading, setLoading] = useState(false);
+
     return (
         <View>
             <View style={{flexDirection: "row", alignItems: "center"}}>
@@ -17,7 +21,7 @@ export function SocialBox(){
                     <Image source={require("../../../assets/facebook.png")} style={{width: 25, height: 25, marginRight: 10}}/>
                     <Text style={{color: COLORS.gray}}>Facebook</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.socialButton, {marginLeft: 5}]} onPress={() => onGoogleButtonPress().then(() => console.log('Signed in with Google!'))}>
+                <TouchableOpacity style={[styles.socialButton, {marginLeft: 5}]} onPress={() => onGoogleButtonPress(setLoading, setDisconnected).then(() => console.log('Signed in with Google!'))}>
                     <Image source={require("../../../assets/google.png")} style={{width: 25, height: 25, marginRight: 10}}/>
                     <Text style={{color: COLORS.gray}}>Google</Text>
                 </TouchableOpacity>

@@ -30,10 +30,12 @@ export const handleSignUp = async (email, password, name, picture, setLoading, s
         });
 }
 
-export const handleSignIn = async (email, password, setDisconnected) => {
+export const handleSignIn = async (email, password, setLoading, setDisconnected) => {
+    setLoading(true);
     auth().signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
             const user = userCredential.user;
+            setLoading(false);
             setDisconnected(false);
             console.log("user logged successfully");
         })
@@ -48,7 +50,8 @@ export const signOut = () => {
         .then(() => console.log('User signed out!'));
 }
 
-export async function onGoogleButtonPress() {
+export async function onGoogleButtonPress(setLoading, setDisconnected) {
+    setLoading(true);
     // Check if your device supports Google Play
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
     // Get the users ID token
@@ -58,6 +61,8 @@ export async function onGoogleButtonPress() {
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
   
     // Sign-in the user with the credential
+    setLoading(false);
+    setDisconnected(false);
     return auth().signInWithCredential(googleCredential);
 }
 

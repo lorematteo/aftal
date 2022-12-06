@@ -19,7 +19,7 @@ export default function DiscoverScreen(){
                 style={{width: width, padding: 5}}
                 />
             </View>
-      </SafeAreaView>
+        </SafeAreaView>
     );
 }
 

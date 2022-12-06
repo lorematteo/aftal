@@ -28,7 +28,7 @@ export default function HomeTabs(){
 
           // You can return any component that you like here!
           return (
-            <Ionicons name={iconSrc} size={width*0.07} color={focused ? "#232323" : "#8A8993"}/>
+            <Ionicons name={iconSrc} size={width*0.07} color={focused ? COLORS.primary : COLORS.gray}/>
           );
         },
         tabBarActiveTintColor: '#232323',
