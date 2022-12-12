@@ -1,7 +1,7 @@
 import { FlatList, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import React, {useEffect, useState} from 'react';
 
-import { width, height, Android} from '../../utils/constants';
+import { width, height, Android, COLORS} from '../../utils/constants';
 
 import { events as eventsObj } from "./data";
 
@@ -12,7 +12,13 @@ export default function DiscoverScreen(){
             <View style={{alignItems: "center", justifyContent: "space-between"}}>
                 <FlatList
                 data={eventsObj}
-                ListHeaderComponent={<Text style={styles.title}>Découvrir</Text>}
+                ListHeaderComponent={
+                    <View style={{ padding: 15 }}>
+                        <Text style={styles.title}>Découvrir</Text>
+                        <Text style={styles.subtitle}>Rencontre des personnes en accord avec tes intérêts et envies du moment !</Text>
+                    </View>
+                    
+                }
                 renderItem={({ item }) => <EventCard title={item.name} type={item.type}/>}
                 numColumns={2}
                 keyExtractor={(item) => item.name}
@@ -28,17 +34,16 @@ const EventCard = ({title, type, desc}) => (
         height: height*0.3,
         backgroundColor: "lightgray",
         borderRadius: 15,
-        padding: 5,
         margin: 5,
         flex: 1
     }}>
         <View style={{flex: 1, justifyContent: "space-between"}}>
             <View></View>
             <Text>{title}</Text>
-            <View>
-                <Text>{desc}</Text>
+            <View style={{ backgroundColor: "white", width: "50%", borderTopRightRadius: 95, padding: 5}}>
                 <Text>{type}</Text>
             </View>
+            
         </View>
     </TouchableOpacity>
 )
@@ -53,5 +58,10 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 35,
         fontWeight: "500",
+        color: COLORS.primary,
+    },
+    subtitle: {
+        fontSize: 13,
+        color: COLORS.gray,
     }
 });
