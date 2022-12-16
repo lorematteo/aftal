@@ -2,13 +2,20 @@ import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, View, Text, Image, TouchableOpacity, } from "react-native";
 
 import { width, height, COLORS } from "../../../utils/constants";
+import { signOut } from "../../../utils/firebase";
 
 export default function NotifScreen({ navigation }) {
     return (
       <View style={styles.container}>
-        <TouchableOpacity onPress={() => navigation.navigate("Match")}>
-            <Ionicons style={{width: width*0.9, left: 0}} name={"arrow-back"} size={25}/>
-        </TouchableOpacity>
+        <View style={styles.topBar}>
+            <TouchableOpacity onPress={() => navigation.navigate("Match")}>
+                <Ionicons name={"arrow-back"} size={25}/>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={signOut}>
+                <Text style={{ fontSize: 15, fontWeight: "500", color: "red", opacity: 0.7 }}>Log Out</Text>
+            </TouchableOpacity>
+        </View>
+        
         
         <Profil/>
         <Settings/>
@@ -19,22 +26,22 @@ export default function NotifScreen({ navigation }) {
 function Profil() {
     return (
         <View style={{alignItems: "center"}}>
-            <View style={{width: width*0.25, height: width*0.25,}}>
+            <View style={{width: height*0.2, height: height*0.2,}}>
                 <Image style={styles.profilPic} source={require("../../../assets/2.jpeg")}/>
                 <View style={{
                     backgroundColor: "#EEC8E0",
                     position: "absolute",
                     bottom: -10,
                     right: -10,
-                    width: width*0.1,
-                    height: width*0.1,
+                    width: height*0.07,
+                    height: height*0.07,
                     alignItems: "center",
                     justifyContent: "center",
                     borderColor: "#efefef",
                     borderRadius: 95,
                     borderWidth: 4,
                 }}>
-                    <Ionicons name="camera" size={width*0.05}/>
+                    <Ionicons name="download-outline" size={height*0.035}/>
                 </View>
             </View>
             <Text style={{fontSize: 25, fontWeight: "bold", padding: width*0.05}}>Mattéo Lo Re</Text>
@@ -110,9 +117,16 @@ const styles = StyleSheet.create({
         justifyContent: "space-around",
         padding: 30,
     },
+    topBar: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 20,
+        width: width,
+    },
     profilPic: {
-        width: width*0.25,
-        height: width*0.25,
+        width: height*0.2,
+        height: height*0.2,
         borderRadius: 95,
     },
     settingContainer: {

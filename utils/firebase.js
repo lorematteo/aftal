@@ -1,11 +1,25 @@
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import firestore from '@react-native-firebase/firestore';
 
 GoogleSignin.configure({
     webClientId: "802202870854-69ncrjel7ora5olfptons8lptl2f9va3.apps.googleusercontent.com",
 });
 
+
+function addUserToDB(id, name, profilpic){
+    firestore()
+        .collection('users')
+        .doc(id)
+        .set({
+            name: name,
+            profilpic: profilpic,
+        })
+        .then(() => {
+            console.log('user added to db!');
+        });
+}
 
 export const handleSignUp = async (email, password, name, picture, setLoading, step, setStep) => {
     setLoading(true);
@@ -17,6 +31,7 @@ export const handleSignUp = async (email, password, name, picture, setLoading, s
                     photoURL: url,
                 };
                 userCredential.user.updateProfile(update);
+                addUserToDB(userCredential.user.uid, name, url);
                 setLoading(false);
                 setStep(step+1);
                 console.log("user created successfully");

@@ -5,6 +5,7 @@ import HomeTabs from "../Home/home"
 import FilterScreen from "../Home/screens/filter";
 import NotifScreen from "../Home/screens/notif";
 import ProfilScreen from "../Home/screens/profil";
+import CardSetupScreen from "../Home/screens/cardsetup";
 
 const HomeStack = createNativeStackNavigator();
 
@@ -20,8 +21,8 @@ export default function MainScreen() {
           <HomeStack.Screen name="Profil" component={ProfilScreen} options={{animation: "slide_from_bottom"}}/>
         </HomeStack.Group>
 
-        <HomeStack.Group>
-          
+        <HomeStack.Group screenOptions={{ presentation: "modal"}}>
+          <HomeStack.Screen name="CardSetup" component={CardSetupScreen} />
         </HomeStack.Group>
 
         

@@ -6,7 +6,6 @@ import Svg, { Path } from 'react-native-svg';
 import { width, height, CARDSIZE, ACTION_OFFSET, Android} from '../../../utils/constants';
 
 import Card from '../components/cardComponent';
-import { signOut } from "../../../utils/firebase";
 
 import { profiles as profilesObj } from '../data';
 
@@ -35,9 +34,7 @@ function TopBar({nav}){
       </TouchableOpacity>
       
       <Text style={{fontSize: width>380 ? 20 : 18}}>Hi, </Text>
-      <TouchableOpacity onPress={signOut}>
-        <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
-      </TouchableOpacity>
+      <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
       
   
       <View style={{flex:1}}></View>
