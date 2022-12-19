@@ -1,10 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
 
 export default function ChatScreen(){
     return (
-        <View style={styles.Appcontainer}>
+        <SafeAreaView style={styles.Appcontainer}>
             <Text>Chat with people who liked you.</Text>
-        </View>
+        </SafeAreaView>
     );
 }
 

@@ -13,13 +13,6 @@ export const CARDSIZE = {
   
 export const ACTION_OFFSET = 100;
 
-
-export const Android = StyleSheet.create({
-  SafeArea: {
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
-  }
-});
-
 export const COLORS = {
   primary: "#5994EB",
   gray: "#8A8993",

@@ -32,7 +32,7 @@ export default function SignInScreen({ navigation }){
     const [loading, setLoading] = useState(false);
 
     return (
-        <SafeAreaView style={[Android.SafeArea, {flex: 1, backgroundColor: "white"}]}>
+        <SafeAreaView style={{flex: 1, backgroundColor: "white"}}>
             <View style={styles.container}>
                 <View>
                 <Text style={{

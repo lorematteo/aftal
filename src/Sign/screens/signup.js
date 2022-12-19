@@ -56,7 +56,7 @@ export default function SignUpMail({ navigation }){
     }
 
     return (
-        <SafeAreaView style={[Android.SafeArea, {flex: 1, backgroundColor: "white"}]}>
+        <SafeAreaView style={{flex: 1, backgroundColor: "white"}}>
             <View style={[styles.container]}>
 
                 {(step==0) ? 

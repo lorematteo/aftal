@@ -1,12 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, View, Text, Image, TouchableOpacity, } from "react-native";
+import { StyleSheet, View, Text, Image, TouchableOpacity, SafeAreaView } from "react-native";
 
 import { width, height, COLORS } from "../../../utils/constants";
 import { signOut } from "../../../utils/firebase";
 
 export default function NotifScreen({ navigation }) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.topBar}>
             <TouchableOpacity onPress={() => navigation.navigate("Match")}>
                 <Ionicons name={"arrow-back"} size={25}/>
@@ -19,7 +19,7 @@ export default function NotifScreen({ navigation }) {
         
         <Profil/>
         <Settings/>
-      </View>
+    </SafeAreaView>
     );
 };
 

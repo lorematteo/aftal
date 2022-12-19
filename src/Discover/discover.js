@@ -1,14 +1,14 @@
 import { FlatList, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import React, {useEffect, useState} from 'react';
 
-import { width, height, Android, COLORS} from '../../utils/constants';
+import { width, height, COLORS} from '../../utils/constants';
 
 import { events as eventsObj } from "./data";
 
 export default function DiscoverScreen(){
 
     return (
-        <SafeAreaView style={[styles.viewContainer, Android.SafeArea]}>
+        <SafeAreaView style={styles.viewContainer}>
             <View style={{alignItems: "center", justifyContent: "space-between"}}>
                 <FlatList
                 data={eventsObj}

@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useRef, useCallback, useEffect} from "react";
 import Svg, { Path } from 'react-native-svg';
 
-import { width, height, CARDSIZE, ACTION_OFFSET, Android} from '../../../utils/constants';
+import { width, height, CARDSIZE, ACTION_OFFSET } from '../../../utils/constants';
 
 import Card from '../components/cardComponent';
 
@@ -12,7 +12,7 @@ import { profiles as profilesObj } from '../data';
 
 export default function MatchScreen({ navigation }) {
   return (
-    <SafeAreaView style={[styles.viewContent, Android.SafeArea]}>
+    <SafeAreaView style={[styles.viewContent]}>
       <TopBar nav={navigation} />
       <MatchContainer/>
     </SafeAreaView>
