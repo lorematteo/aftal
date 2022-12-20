@@ -34,7 +34,10 @@ function TopBar({nav}){
       </TouchableOpacity>
       
       <Text style={{fontSize: width>380 ? 20 : 18}}>Hi, </Text>
-      <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
+      <TouchableOpacity onPress={() => nav.navigate("CardSetup")}>
+        <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
+      </TouchableOpacity>
+      
       
   
       <View style={{flex:1}}></View>
