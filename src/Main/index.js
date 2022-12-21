@@ -10,6 +10,7 @@ import CardSetupScreen from "../Home/screens/cardsetup";
 const HomeStack = createNativeStackNavigator();
 
 export default function MainScreen() {
+
   return (
     <NavigationContainer>
       <HomeStack.Navigator screenOptions={{ headerShown: false }}>

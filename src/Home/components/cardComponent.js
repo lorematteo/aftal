@@ -35,7 +35,7 @@ export default function Card({
   return (
     <Animated.View style={[styles.cardContainer, isFirst && animatedCardStyle]} {...rest}>
 
-      <Image source={source} style={styles.image} />
+      <Image source={{uri: source}} style={styles.image} />
       
       <Text style={styles.cardName}>{name}</Text>
 
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   cardName: {
     position: "absolute",
-    fontSize: 35,
+    fontSize: 25,
     fontWeight: "bold",
     color: "white",
     textShadowColor: "rgba(0, 0, 0, 0.4)",

@@ -90,3 +90,35 @@ const uploadImage = async (uri, name, firebasePath) => {
         console.log(err);
     }
 }
+
+export async  function checkUserExistence(userUid){
+    const unsub = firestore()
+        .collection('users')
+        .doc(userUid)
+        .onSnapshot(documentSnapshot => {
+            if (!documentSnapshot.exists){
+                return false;
+            } else{
+                return true;
+            }
+    });
+
+    return unsub();
+}
+
+export async function fetchCards(setProfiles){
+    let unsub;
+    unsub = firestore()
+      .collection('users')
+      .onSnapshot(snapshot => {
+        setProfiles(
+            snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }))
+        )
+    });
+
+    // Stop listening for updates when no longer required
+    return () => unsub();
+} 

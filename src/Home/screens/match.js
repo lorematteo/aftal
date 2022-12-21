@@ -1,20 +1,20 @@
 import { StyleSheet, Text, View, Animated, Image, PanResponder, SafeAreaView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useRef, useCallback, useEffect} from "react";
+import React, { useState, useRef, useCallback, useEffect, useLayoutEffect} from "react";
 import Svg, { Path } from 'react-native-svg';
+import auth, { firebase } from '@react-native-firebase/auth';
 
 import { width, height, CARDSIZE, ACTION_OFFSET } from '../../../utils/constants';
 
 import Card from '../components/cardComponent';
-
-import { profiles as profilesObj } from '../data';
+import { checkUserExistence, fetchCards } from "../../../utils/firebase";
 
 
 export default function MatchScreen({ navigation }) {
   return (
     <SafeAreaView style={[styles.viewContent]}>
       <TopBar nav={navigation} />
-      <MatchContainer/>
+      <MatchContainer nav={navigation}/>
     </SafeAreaView>
   );
 }
@@ -34,9 +34,7 @@ function TopBar({nav}){
       </TouchableOpacity>
       
       <Text style={{fontSize: width>380 ? 20 : 18}}>Hi, </Text>
-      <TouchableOpacity onPress={() => nav.navigate("CardSetup")}>
-        <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>Mattéo</Text>
-      </TouchableOpacity>
+      <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>{firebase.auth().currentUser.displayName}</Text>
       
       
   
@@ -56,16 +54,25 @@ function TopBar({nav}){
 
 
 /// SWIPEABLE CARDS
-function MatchContainer(){
+function MatchContainer({nav}){
+
+  const user = firebase.auth().currentUser;
 
   const swipe = useRef(new Animated.ValueXY()).current;
   const tiltSign = useRef(new Animated.Value(1)).current;
-  const [profiles, setProfiles] = useState(profilesObj);
+  const [profiles, setProfiles] = useState([]);
+
+  useLayoutEffect(() => {
+    if(checkUserExistence(user.uid)){
+      nav.navigate("CardSetup");
+    }
+  });
 
   useEffect(() => {
     if (profiles.length === 0) {
-      setProfiles(profilesObj);
+      console.log("no more cards !");
     }
+    fetchCards(setProfiles);
   }, [profiles]);
 
   const panResponder = useRef(
@@ -122,7 +129,7 @@ function MatchContainer(){
   return (
     <View style={styles.matchCard}>
       {profiles
-        .map(({ name, source }, index) => {
+        .map(({ name, profilpic }, index) => {
           const isFirst = index === 0;
           const panHandlers = isFirst ? panResponder.panHandlers : {};
 
@@ -130,7 +137,7 @@ function MatchContainer(){
             <Card
               key={name}
               name={name}
-              source={source}
+              source={profilpic}
               isFirst={isFirst}
               swipe={swipe}
               tiltSign={tiltSign}
