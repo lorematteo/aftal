@@ -102,7 +102,7 @@ export default function SignUpMail({ navigation }){
                         : 
                             <Text style={{color: "white", fontWeight: "700"}}>{(step>=4) ? "Start !" : "Next"}</Text>
                         }
-                    </TouchableOpacity>  
+                    </TouchableOpacity>
 
                     {(step==0) ? <SocialBox setDisconnected={route.params.setDisconnected}/> : null}
                     

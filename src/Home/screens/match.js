@@ -3,25 +3,28 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useRef, useCallback, useEffect, useLayoutEffect} from "react";
 import Svg, { Path } from 'react-native-svg';
 import auth, { firebase } from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 import { width, height, CARDSIZE, ACTION_OFFSET } from '../../../utils/constants';
 
 import Card from '../components/cardComponent';
-import { checkUserExistence, fetchCards } from "../../../utils/firebase";
 
 
 export default function MatchScreen({ navigation }) {
+
+  const user = firebase.auth().currentUser;
+
   return (
     <SafeAreaView style={[styles.viewContent]}>
-      <TopBar nav={navigation} />
-      <MatchContainer nav={navigation}/>
+      <TopBar nav={navigation} user={user}/>
+      <MatchContainer nav={navigation} user={user}/>
     </SafeAreaView>
   );
 }
 
 
 /// TOP BAR
-function TopBar({nav}){
+function TopBar({nav, user}){
   return (
     <View style={{
       flexDirection: "row",
@@ -34,7 +37,7 @@ function TopBar({nav}){
       </TouchableOpacity>
       
       <Text style={{fontSize: width>380 ? 20 : 18}}>Hi, </Text>
-      <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>{firebase.auth().currentUser.displayName}</Text>
+      <Text style={{fontSize: width>380 ? 20 : 18, fontWeight: "bold"}}>{user.displayName}</Text>
       
       
   
@@ -54,26 +57,45 @@ function TopBar({nav}){
 
 
 /// SWIPEABLE CARDS
-function MatchContainer({nav}){
-
-  const user = firebase.auth().currentUser;
+function MatchContainer({nav, user}){
 
   const swipe = useRef(new Animated.ValueXY()).current;
   const tiltSign = useRef(new Animated.Value(1)).current;
   const [profiles, setProfiles] = useState([]);
 
-  useLayoutEffect(() => {
-    if(checkUserExistence(user.uid)){
-      nav.navigate("CardSetup");
-    }
-  });
+  useEffect(() => {
+    const unsub = firestore()
+        .collection('users')
+        .doc(user.uid)
+        .onSnapshot(documentSnapshot => {
+            if (!documentSnapshot.exists){
+                nav.navigate("CardSetup");
+            }
+    });
+
+    console.log("checking user existence");
+    return unsub;
+  }, []);
 
   useEffect(() => {
-    if (profiles.length === 0) {
-      console.log("no more cards !");
+    let unsub;
+
+    const fetchCards = async () => {
+      unsub = firestore()
+      .collection('users')
+      .onSnapshot(snapshot => {
+        setProfiles(
+            snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }))
+        )
+      });
     }
-    fetchCards(setProfiles);
-  }, [profiles]);
+
+    fetchCards();
+    return unsub;
+  }, []);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -86,7 +108,7 @@ function MatchContainer({nav}){
         onPanResponderRelease: (e, { dx, dy }) => {
           const direction = Math.sign(dx);
           const userAction = Math.abs(dx) > ACTION_OFFSET;
-
+          
           if (userAction) {
             Animated.timing(swipe, {
               duration: 200,
@@ -111,17 +133,16 @@ function MatchContainer({nav}){
   ).current;
 
   const transitionNext = useCallback(() => {
-      setProfiles((prevState) => prevState.slice(1));
-      swipe.setValue({ x: 0, y: 0 });
-    }, [swipe]);
+    setProfiles((prevState) => prevState.slice(1));
+    swipe.setValue({ x: 0, y: 0 });
+  }, [swipe]);
   
-  const handleChoice = useCallback(
-    (sign) => {
-      Animated.timing(swipe.x, {
-        duration: 400,
-        toValue: sign * CARDSIZE.OUTWIDTH,
-        useNativeDriver: true,
-      }).start(transitionNext);
+  const handleChoice = useCallback((sign) => {
+    Animated.timing(swipe.x, {
+      duration: 400,
+      toValue: sign * CARDSIZE.OUTWIDTH,
+      useNativeDriver: true,
+    }).start(transitionNext);
     },
     [swipe.x, transitionNext]
   );
@@ -129,13 +150,13 @@ function MatchContainer({nav}){
   return (
     <View style={styles.matchCard}>
       {profiles
-        .map(({ name, profilpic }, index) => {
+        .map(({ id, name, profilpic }, index) => {
           const isFirst = index === 0;
           const panHandlers = isFirst ? panResponder.panHandlers : {};
 
           return (
             <Card
-              key={name}
+              key={id}
               name={name}
               source={profilpic}
               isFirst={isFirst}

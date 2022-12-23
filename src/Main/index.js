@@ -22,7 +22,7 @@ export default function MainScreen() {
           <HomeStack.Screen name="Profil" component={ProfilScreen} options={{animation: "slide_from_bottom"}}/>
         </HomeStack.Group>
 
-        <HomeStack.Group screenOptions={{ presentation: "modal"}}>
+        <HomeStack.Group screenOptions={{ presentation: "modal", gestureEnabled: false}}>
           <HomeStack.Screen name="CardSetup" component={CardSetupScreen} />
         </HomeStack.Group>
 

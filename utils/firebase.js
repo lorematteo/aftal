@@ -8,15 +8,22 @@ GoogleSignin.configure({
 });
 
 
-function addUserToDB(id, name, profilpic){
+export function addUserToDB(setLoading, id, name, profilpic, birthdate, picture1, picture2, picture3, instrument){
+    setLoading(true);
     firestore()
         .collection('users')
         .doc(id)
         .set({
             name: name,
             profilpic: profilpic,
+            birthdate: birthdate,
+            picture1: picture1,
+            picture2: picture2,
+            picture3: picture3,
+            instrument: instrument,
         })
         .then(() => {
+            setLoading(false);
             console.log('user added to db!');
         });
 }
@@ -31,7 +38,6 @@ export const handleSignUp = async (email, password, name, picture, setLoading, s
                     photoURL: url,
                 };
                 userCredential.user.updateProfile(update);
-                addUserToDB(userCredential.user.uid, name, url);
                 setLoading(false);
                 setStep(step+1);
                 console.log("user created successfully");
@@ -81,7 +87,7 @@ export async function onGoogleButtonPress(setLoading, setDisconnected) {
     return auth().signInWithCredential(googleCredential);
 }
 
-const uploadImage = async (uri, name, firebasePath) => {
+export const uploadImage = async (uri, name, firebasePath) => {
     try {
         const imageRef = storage().ref(`${firebasePath}/${name}`);
         await imageRef.putFile(uri, { contentType: 'image/jpg'}).catch((error) => { throw error });
@@ -91,8 +97,10 @@ const uploadImage = async (uri, name, firebasePath) => {
     }
 }
 
-export async  function checkUserExistence(userUid){
-    const unsub = firestore()
+
+export async function checkUserExistence(userUid){
+    let unsub;
+    unsub = firestore()
         .collection('users')
         .doc(userUid)
         .onSnapshot(documentSnapshot => {
@@ -103,10 +111,10 @@ export async  function checkUserExistence(userUid){
             }
     });
 
-    return unsub();
+    return () => unsub();
 }
 
-export async function fetchCards(setProfiles){
+async function fetchCards(setProfiles){
     let unsub;
     unsub = firestore()
       .collection('users')
