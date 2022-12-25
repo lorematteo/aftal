@@ -5,7 +5,7 @@ import Svg, { Path } from 'react-native-svg';
 import auth, { firebase } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-import { width, height, CARDSIZE, ACTION_OFFSET } from '../../../utils/constants';
+import { width, height, CARDSIZE, ACTION_OFFSET, COLORS } from '../../../utils/constants';
 
 import Card from '../components/cardComponent';
 
@@ -33,7 +33,7 @@ function TopBar({nav, user}){
       paddingTop: 10,
     }}>
       <TouchableOpacity onPress={() => nav.navigate("Profil")}>
-        <Image style={styles.profilPic} source={require("../../../assets/2.jpeg")}/>
+        <Image style={styles.profilPic} source={{uri: user.photoURL}}/>
       </TouchableOpacity>
       
       <Text style={{fontSize: width>380 ? 20 : 18}}>Hi, </Text>
@@ -63,6 +63,8 @@ function MatchContainer({nav, user}){
   const tiltSign = useRef(new Animated.Value(1)).current;
   const [profiles, setProfiles] = useState([]);
 
+
+  // Checking user existence in firestore db
   useEffect(() => {
     const unsub = firestore()
         .collection('users')
@@ -77,15 +79,30 @@ function MatchContainer({nav, user}){
     return unsub;
   }, []);
 
+
+  // Fetching cards
   useEffect(() => {
     let unsub;
 
     const fetchCards = async () => {
+      const passes = await firestore().collection("users").doc(user.uid).collection("passes").get().then(
+        (snapshot) => snapshot.docs.map((doc) => doc.id)
+      );
+      const likes = await firestore().collection("users").doc(user.uid).collection("likes").get().then(
+        (snapshot) => snapshot.docs.map((doc) => doc.id)
+      );
+
+      const passedUserIds = passes.length > 0 ? passes : ["empty"];
+      const likedUserIds = likes.length > 0 ? likes : ["empty"];
+
+      console.log([...passedUserIds, ...likedUserIds]);
+
       unsub = firestore()
       .collection('users')
+      .where("id", "not-in", [...passedUserIds, ...likedUserIds])
       .onSnapshot(snapshot => {
         setProfiles(
-            snapshot.docs.map((doc) => ({
+            snapshot.docs.filter(doc => doc.id != user.uid).map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
             }))
@@ -137,7 +154,42 @@ function MatchContainer({nav, user}){
     swipe.setValue({ x: 0, y: 0 });
   }, [swipe]);
   
-  const handleChoice = useCallback((sign) => {
+  const handleLike = (userSwiped) => {
+    if(!userSwiped) return;
+
+    console.log("like on "+userSwiped.name);
+
+    firestore()
+      .collection("users")
+      .doc(user.uid)
+      .collection("likes")
+      .doc(userSwiped.id)
+      .set({
+        userSwiped
+      })
+  }
+
+  const handleNo = (userSwiped) => {
+    if(!userSwiped) return;
+
+    console.log("passed on "+userSwiped.name);
+
+    firestore()
+      .collection("users")
+      .doc(user.uid)
+      .collection("passes")
+      .doc(userSwiped.uid)
+      .set({
+        userSwiped
+      })
+  }
+
+  const handleChoice = useCallback((sign, userSwiped) => {
+    if(sign==1){
+      handleLike(userSwiped);
+    } else {
+      handleNo(userSwiped);
+    }
     Animated.timing(swipe.x, {
       duration: 400,
       toValue: sign * CARDSIZE.OUTWIDTH,
@@ -150,7 +202,7 @@ function MatchContainer({nav, user}){
   return (
     <View style={styles.matchCard}>
       {profiles
-        .map(({ id, name, profilpic }, index) => {
+        .map(({ id, name, profilpic, picture1 }, index) => {
           const isFirst = index === 0;
           const panHandlers = isFirst ? panResponder.panHandlers : {};
 
@@ -158,7 +210,7 @@ function MatchContainer({nav, user}){
             <Card
               key={id}
               name={name}
-              source={profilpic}
+              source={picture1}
               isFirst={isFirst}
               swipe={swipe}
               tiltSign={tiltSign}
@@ -168,13 +220,17 @@ function MatchContainer({nav, user}){
         })
         .reverse()
       }
-
+      
+      <View style={{position: "absolute", marginTop: CARDSIZE.HEIGHT*0.4, alignItems: "center", justifyContent: "center", zIndex: -1}}>
+        <Text style={{color: COLORS.gray, fontSize: 18}}>No more profiles in your area.</Text>
+        <Ionicons name="sad-outline" size={55} color={COLORS.gray} style={{padding: 10}}/>
+      </View>
       <View style={styles.buttonsBox}>
         <MusicPlayer handleSong={() => alert("play music")}/>
 
         <ButtonBar
-          handleLike={() => handleChoice(1)}
-          handleNo={() => handleChoice(-1)}
+          handleLike={() => handleChoice(1, profiles[0])}
+          handleNo={() => handleChoice(-1, profiles[0])}
           emoji={(profiles.length === 0 ) ? "" : profiles[0].emoji}
         />
       </View>

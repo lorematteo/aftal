@@ -145,15 +145,24 @@ export default function CardSetupScreen( {navigation} ) {
                     if(picture1!=""){
                         if(instrument!=""){
                             setLoading(true);
-                            uploadImage(picture1, "i1"+user.uid, user.uid).then(url => setPicture1(url));
-                            if(picture2!=""){
-                                uploadImage(picture2, "i2"+user.uid, user.uid).then(url => setPicture2(url));
-                            }
-                            if(picture3!=""){
-                                uploadImage(picture3, "i3"+user.uid, user.uid).then(url => setPicture3(url));
-                            }
-                            addUserToDB(setLoading, user.uid, user.displayName, user.photoURL, birthdate, picture1, picture2, picture3, instrument);
-                            navigation.goBack();
+                            uploadImage(picture1, "i1"+user.uid, "users/"+user.uid).then((url1) => {
+                                if(picture2!=""){
+                                    uploadImage(picture2, "i2"+user.uid, "users/"+user.uid).then((url2) => {
+                                        if(picture3!=""){
+                                            uploadImage(picture3, "i3"+user.uid, "users/"+user.uid).then((url3) =>{
+                                                addUserToDB(setLoading, user.uid, user.displayName, user.photoURL, birthdate, url1, url2, url3, instrument);
+                                                navigation.goBack();
+                                            });
+                                        } else {
+                                            addUserToDB(setLoading, user.uid, user.displayName, user.photoURL, birthdate, url1, url2, "", instrument);
+                                            navigation.goBack();
+                                        }
+                                });
+                                } else {
+                                    addUserToDB(setLoading, user.uid, user.displayName, user.photoURL, birthdate, url1, "", "", instrument);
+                                    navigation.goBack();
+                                }
+                            })
                         }
                     }
                 }

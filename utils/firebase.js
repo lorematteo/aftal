@@ -14,6 +14,7 @@ export function addUserToDB(setLoading, id, name, profilpic, birthdate, picture1
         .collection('users')
         .doc(id)
         .set({
+            id: id,
             name: name,
             profilpic: profilpic,
             birthdate: birthdate,
@@ -32,7 +33,7 @@ export const handleSignUp = async (email, password, name, picture, setLoading, s
     setLoading(true);
     auth().createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            uploadImage(picture, userCredential.user.uid, "profiles").then(url => {
+            uploadImage(picture, "prof"+userCredential.user.uid, "users/"+userCredential.user.uid).then(url => {
                 const update = {
                     displayName: name,
                     photoURL: url,
