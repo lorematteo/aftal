@@ -63,7 +63,7 @@ export default function SignInScreen({ navigation }){
 
                 <View style={styles.inputPanel}>
                     <View style={styles.inputContainer}>
-                        <TextInput autoCorrect={false} placeholder="Email" value={email} onChangeText={text => setEmail(text)} style={styles.input}/>
+                        <TextInput autoCorrect={false} placeholder="Email" value={email} onChangeText={text => setEmail(text.toLowerCase())} style={styles.input}/>
                         <TouchableOpacity onPress={() => setEmail("")} style={{paddingLeft: 0,}}>
                             <Ionicons style={styles.iconcroix} color={COLORS.gray} name="close-circle-outline" size={width>380 ? 25 : 23}/>
                         </TouchableOpacity>

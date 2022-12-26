@@ -1,11 +1,12 @@
 import { StyleSheet, Text, View, Animated, Image, PanResponder, SafeAreaView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useRef, useCallback, useEffect, useLayoutEffect} from "react";
+import React, { useRef, useCallback, useEffect, useLayoutEffect} from "react";
+import useState from 'react-usestateref'
 import Svg, { Path } from 'react-native-svg';
 import auth, { firebase } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-import { width, height, CARDSIZE, ACTION_OFFSET, COLORS } from '../../../utils/constants';
+import { width, height, CARDSIZE, ACTION_OFFSET, COLORS, generateMatchId } from '../../../utils/constants';
 
 import Card from '../components/cardComponent';
 
@@ -61,7 +62,7 @@ function MatchContainer({nav, user}){
 
   const swipe = useRef(new Animated.ValueXY()).current;
   const tiltSign = useRef(new Animated.Value(1)).current;
-  const [profiles, setProfiles] = useState([]);
+  const [profiles, setProfiles, profilesref] = useState([]);
 
 
   // Checking user existence in firestore db
@@ -127,14 +128,7 @@ function MatchContainer({nav, user}){
           const userAction = Math.abs(dx) > ACTION_OFFSET;
           
           if (userAction) {
-            Animated.timing(swipe, {
-              duration: 200,
-              toValue: {
-                x: direction * CARDSIZE.OUTWIDTH,
-                y: dy,
-              },
-              useNativeDriver: true,
-            }).start(transitionNext);
+            handleSwipe(tiltSign, direction, dy);
           } else {
             Animated.spring(swipe, {
               friction: 5,
@@ -146,27 +140,79 @@ function MatchContainer({nav, user}){
             }).start();
           }
         },
-    })
+    }), user
   ).current;
 
+  const handleSwipe = useCallback((tiltSign, direction, dy) => {
+    let userSwiped = profilesref.current[0];
+    let sign = Number.parseInt(JSON.stringify(tiltSign));
+    if(sign==1){
+      handleLike(userSwiped);
+    } else {
+      handleNo(userSwiped);
+    }
+    Animated.timing(swipe, {
+      duration: 200,
+      toValue: {
+        x: direction * CARDSIZE.OUTWIDTH,
+        y: dy,
+      },
+      useNativeDriver: true,
+    }).start(transitionNext);
+  }, [swipe, transitionNext]
+  );
+  
   const transitionNext = useCallback(() => {
     setProfiles((prevState) => prevState.slice(1));
     swipe.setValue({ x: 0, y: 0 });
   }, [swipe]);
   
-  const handleLike = (userSwiped) => {
+  const handleLike = async (userSwiped) => {
     if(!userSwiped) return;
 
     console.log("like on "+userSwiped.name);
 
-    firestore()
-      .collection("users")
-      .doc(user.uid)
-      .collection("likes")
-      .doc(userSwiped.id)
-      .set({
-        userSwiped
-      })
+    const loggedInProfile = await firestore().collection("users").doc(user.uid).get().then((snapshot) => snapshot.data());
+
+    //Check if the user has swiped on you
+    firestore().collection("users").doc(userSwiped.id).collection("likes").doc(user.uid).get().then( (docSnap) => {
+      if(docSnap.exists){
+        // userSwiped has already like the actual user -> CREATE A MATCH
+        console.log("yeahh, you matched!")
+
+        firestore()
+        .collection("users")
+        .doc(user.uid)
+        .collection("likes")
+        .doc(userSwiped.id)
+        .set({
+          userSwiped
+        })
+
+        firestore()
+        .collection("matches")
+        .doc(generateMatchId(user.uid, userSwiped.id))
+        .set({
+          users: {[user.uid] : loggedInProfile, [userSwiped.id] : userSwiped},
+          usersMatched: [user.uid, userSwiped.id],
+          timestamp: firestore.FieldValue.serverTimestamp(),
+        })
+
+        nav.navigate("Matching", { loggedInProfile, userSwiped} )
+      } else {
+        // create first likes between boths
+        firestore()
+        .collection("users")
+        .doc(user.uid)
+        .collection("likes")
+        .doc(userSwiped.id)
+        .set({
+          userSwiped
+        })
+      }
+    })
+
+    
   }
 
   const handleNo = (userSwiped) => {
@@ -283,20 +329,26 @@ function ButtonBar({ handleLike, handleNo, emoji }) {
       <TouchableOpacity onPress={handleNo}>
         <View style={{
           backgroundColor: "#FB7B72",
-          padding: height*0.01,
           borderRadius: 95,
+          width: width*0.15,
+          height: width*0.15,
+          alignItems: "center",
+          justifyContent: "center",
         }}>
-            <Ionicons name="close" size={height*0.05} color="white"/>
+            <Ionicons name="close" size={40} color="white"/>
         </View>
       </TouchableOpacity>
       <Text style={{fontSize: height*0.04}}>{emoji}</Text>
       <TouchableOpacity onPress={handleLike}>
         <View style={{
-          backgroundColor: "#6355EA",
-          padding: height*0.01,
+          backgroundColor: COLORS.green,
           borderRadius: 95,
+          width: width*0.15,
+          height: width*0.15,
+          alignItems: "center",
+          justifyContent: "center",
         }}>
-          <Ionicons name="musical-note" size={height*0.05} color="white"/>
+          <Ionicons name="musical-note" size={38} color="white"/>
         </View>
       </TouchableOpacity>
     </View>
@@ -341,7 +393,7 @@ const styles = StyleSheet.create({
   },
   buttonBar: {
     width: width,
-    paddingTop: CARDSIZE.HEIGHT*0.05,
+    paddingTop: CARDSIZE.HEIGHT*0.02,
     flexDirection: "row",
     paddingHorizontal: width*0.07,
     alignItems: "center",

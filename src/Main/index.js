@@ -6,6 +6,7 @@ import FilterScreen from "../Home/screens/filter";
 import NotifScreen from "../Home/screens/notif";
 import ProfilScreen from "../Home/screens/profil";
 import CardSetupScreen from "../Home/screens/cardsetup";
+import MatchingScreen from "../Home/screens/matching";
 
 const HomeStack = createNativeStackNavigator();
 
@@ -24,6 +25,10 @@ export default function MainScreen() {
 
         <HomeStack.Group screenOptions={{ presentation: "modal", gestureEnabled: false}}>
           <HomeStack.Screen name="CardSetup" component={CardSetupScreen} />
+        </HomeStack.Group>
+
+        <HomeStack.Group screenOptions={{ presentation: "transparentModal", gestureEnabled: false,}}>
+          <HomeStack.Screen name="Matching" component={MatchingScreen} />
         </HomeStack.Group>
 
         
