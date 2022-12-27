@@ -15,8 +15,10 @@ export const ACTION_OFFSET = 100;
 
 export const COLORS = {
   primary: "#5994EB",
+  lightprimary: "#F2F6FF",
   green: "#59B85D",
   gray: "#8A8993",
+  lightgray: "#F2F2F2"
 };
 
 export const generateMatchId = (id1, id2) => { id1 < id2 ? id1+id2 : id2+id1};

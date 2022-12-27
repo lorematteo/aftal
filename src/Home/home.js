@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import MatchScreen from "./screens/match"
 import DiscoverScreen from '../Discover/discover';
-import ChatScreen from '../Chat/chat';
+import ChatMenuScreen from '../Chat/chatmenu';
 import PremiumScreen from '../Profil/profil';
 
 import { width, height, COLORS} from "../../utils/constants";
@@ -39,7 +39,7 @@ export default function HomeTabs(){
       })}>
         <Tab.Screen name="Home" component={MatchScreen}/>
         <Tab.Screen name="Discover" component={DiscoverScreen}/>
-        <Tab.Screen name="Chat" component={ChatScreen}/>
+        <Tab.Screen name="Chat" component={ChatMenuScreen}/>
         <Tab.Screen name="Premium" component={PremiumScreen}/>
       </Tab.Navigator>
   )

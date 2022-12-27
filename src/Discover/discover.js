@@ -9,11 +9,11 @@ export default function DiscoverScreen(){
 
     return (
         <SafeAreaView style={styles.viewContainer}>
-            <View style={{alignItems: "center", justifyContent: "space-between"}}>
+            <View style={{alignItems: "center", justifyContent: "space-between", flex: 1}}>
                 <FlatList
                 data={eventsObj}
                 ListHeaderComponent={
-                    <View style={{ padding: 15 }}>
+                    <View style={{ padding: 10 }}>
                         <Text style={styles.title}>Découvrir</Text>
                         <Text style={styles.subtitle}>Rencontre des personnes en accord avec tes intérêts et envies du moment !</Text>
                     </View>
@@ -22,7 +22,7 @@ export default function DiscoverScreen(){
                 renderItem={({ item }) => <EventCard title={item.name} type={item.type}/>}
                 numColumns={2}
                 keyExtractor={(item) => item.name}
-                style={{width: width, padding: 5}}
+                style={{width: width, margin: 5}}
                 />
             </View>
         </SafeAreaView>

@@ -7,6 +7,7 @@ import NotifScreen from "../Home/screens/notif";
 import ProfilScreen from "../Home/screens/profil";
 import CardSetupScreen from "../Home/screens/cardsetup";
 import MatchingScreen from "../Home/screens/matching";
+import ChatScreen from '../Chat/chat';
 
 const HomeStack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ export default function MainScreen() {
           <HomeStack.Screen name="Filter" component={FilterScreen} />
           <HomeStack.Screen name="Notif" component={NotifScreen} />
           <HomeStack.Screen name="Profil" component={ProfilScreen} options={{animation: "slide_from_bottom"}}/>
+          <HomeStack.Screen name="ChatScreen" component={ChatScreen}/>
         </HomeStack.Group>
 
         <HomeStack.Group screenOptions={{ presentation: "modal", gestureEnabled: false}}>
