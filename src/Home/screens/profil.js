@@ -1,10 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
+import auth, { firebase } from "@react-native-firebase/auth";
 import { StyleSheet, View, Text, Image, TouchableOpacity, SafeAreaView } from "react-native";
 
 import { width, height, COLORS } from "../../../utils/constants";
 import { signOut } from "../../../utils/firebase";
 
-export default function NotifScreen({ navigation }) {
+export default function ProfilScreen({ navigation }) {
+
+    const user = firebase.auth().currentUser;
+
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.topBar}>
@@ -17,17 +21,17 @@ export default function NotifScreen({ navigation }) {
         </View>
         
         
-        <Profil/>
-        <Settings/>
+        <Profil user={user}/>
+        <Settings user={user}/>
     </SafeAreaView>
     );
 };
 
-function Profil() {
+function Profil({user}) {
     return (
         <View style={{alignItems: "center"}}>
             <View style={{width: height*0.2, height: height*0.2,}}>
-                <Image style={styles.profilPic} source={require("../../../assets/2.jpeg")}/>
+                <Image style={styles.profilPic} source={{uri: user.photoURL}}/>
                 <View style={{
                     backgroundColor: "#EEC8E0",
                     position: "absolute",
@@ -44,12 +48,12 @@ function Profil() {
                     <Ionicons name="download-outline" size={height*0.035}/>
                 </View>
             </View>
-            <Text style={{fontSize: 25, fontWeight: "bold", padding: width*0.05}}>Mattéo Lo Re</Text>
+            <Text style={{fontSize: 25, fontWeight: "bold", padding: width*0.05}}>{user.displayName}</Text>
         </View>
     );
 };
 
-function Settings() {
+function Settings({user}) {
 
     const Separator = () => {
         return (
@@ -90,7 +94,7 @@ function Settings() {
     return (
         <View>
             <View style={styles.settingContainer}>
-                <SettingLine name={"Email"} preview={"matteo59115@aol.com"}/>
+                <SettingLine name={"Email"} preview={user.email}/>
                 <Separator/>
                 <SettingLine name={"Date of birth"} preview={"28/08/2001"}/>
                 <Separator/>
@@ -132,7 +136,7 @@ const styles = StyleSheet.create({
     settingContainer: {
         backgroundColor: "white",
         width: width*0.9,
-        borderRadius: 25,
+        borderRadius: 15,
         alignItems: "center",
         marginVertical: 5,
     },
@@ -142,7 +146,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         borderRadius: 15,
-        backgroundColor: "white",
         paddingHorizontal: 15,
     },
 });
