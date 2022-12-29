@@ -1,12 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, FlatList, Image, TouchableOpacity, TextInput, Pressable } from 'react-native';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, SafeAreaView, FlatList, Image, TouchableOpacity, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import auth, { firebase } from '@react-native-firebase/auth';
+import firestore from "@react-native-firebase/firestore";
+import TimeAgo from '@andordavoti/react-native-timeago';
 
 import { COLORS, width, height } from '../../utils/constants';
+import { useRoute } from '@react-navigation/native';
 
 export default function ChatScreen({ navigation }){
 
-    const [message, setMessage] = useState("");
+    const user = firebase.auth().currentUser;
+    const route = useRoute();
+    const {matchDetails} = route.params;
+
+    const [input, setInput] = useState("");
+    const [messages, setMessages] = useState([]);
 
     const dumpMessage = [
         { id: 1, name: "Maria", emoji: "🤠", msg: "Hello it's Maria how are you mattéo i hope you are doing well bla bla bla bla", time: "5min ago", unread: 3},
@@ -16,6 +25,46 @@ export default function ChatScreen({ navigation }){
         { id: 5, name: "Lucas", emoji: "😎", msg: "ca avance bien mais je suis pas sur que ce soit la marche a suivre au pire on verra", time: "a week ago", unread: 0}
     ];
 
+    const getMatchedUserInfos = (users, userLoggedInID) => {
+        const newUsers = {...users};
+        delete newUsers[userLoggedInID];
+
+        const [id, user] = Object.entries(newUsers).flat();
+
+        return { id, ...user };
+    }
+
+    const sendMessage = () => {
+        firestore()
+        .collection("matches")
+        .doc(matchDetails.id)
+        .collection("messages")
+        .add({
+            timestamp: firestore.FieldValue.serverTimestamp(),
+            userId: user.uid,
+            name: user.displayName,
+            profilpic: user.photoURL,
+            message: input,
+        })
+        .then(() => {
+            console.log('message sent!');
+            setInput("");
+        });
+    }
+
+    useEffect(() => {
+        firestore()
+        .collection("matches")
+        .doc(matchDetails.id)
+        .collection("messages")
+        .orderBy("timestamp", "desc")
+        .onSnapshot((snapshot) => {
+            setMessages(snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+            })))
+        });
+    }, [matchDetails])
 
     return (
         <SafeAreaView style={{alignItems: "center", justifyContent: "space-between", flex: 1, backgroundColor: "white"}}>
@@ -24,54 +73,65 @@ export default function ChatScreen({ navigation }){
                         <Ionicons name={"chevron-back"} size={25} color={COLORS.gray}/>
                     </TouchableOpacity>
                     <View style={{justifyContent: "center", alignItems: "center"}}>
-                        <Text style={{fontSize: 21, fontWeight: "bold", color: COLORS.primary}}>Mattéo</Text>
+                        <Text style={{fontSize: 21, fontWeight: "bold", color: COLORS.primary}}>{getMatchedUserInfos(matchDetails.users, user.uid).name}</Text>
                     </View>
                     <TouchableOpacity>
-                        <Image source={require("../../assets/defaultprofilpic.jpeg")} style={{width: width*0.1, height: width*0.1, borderRadius: 95}}/>
+                        <Image source={{uri: getMatchedUserInfos(matchDetails.users, user.uid).profilpic}} style={{width: width*0.1, height: width*0.1, borderRadius: 95}}/>
                     </TouchableOpacity>
                 </View>
-                <FlatList
-                data={dumpMessage}
-                inverted={true}
-                renderItem={({ item }) => <View><SenderMessage content={item.msg} time={item.time}/><ReceiverMessage content={item.msg} time={item.time}/></View>}
-                numColumns={1}
-                keyExtractor={(item) => item.id}
-                style={{backgroundColor: COLORS.lightgray, width: width, padding: 15}}
-                />
-                <View style={styles.footer}>
-                    <TextInput autoCorrect={true} placeholder="Your message" value={message} onChangeText={text => setMessage(text)} style={styles.input}/>
-                    <TouchableOpacity onPress={() => console.log(message)} style={{marginRight: 20}}>
-                        <Ionicons style={styles.iconsend} color={"black"} name="send-sharp" size={20}/>
-                    </TouchableOpacity>
-                </View>
+                <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={0} style={{flex: 1}}>
+                    <FlatList
+                    data={messages}
+                    inverted={true}
+                    renderItem={({ item: message }) => 
+                        message.userId == user.uid ?
+                            <SenderMessage key={message.id} message={message}/>
+                        :
+                            <ReceiverMessage key={message.id} message={message}/>
+                    }
+                    numColumns={1}
+                    keyExtractor={(item) => item.id}
+                    style={{backgroundColor: COLORS.lightgray, width: width, padding: 15}}
+                    />
+                    <View style={styles.footer}>
+                        <TextInput autoCorrect={true} placeholder="Your message" value={input} onChangeText={text => setInput(text)} style={styles.input}/>
+                        <TouchableOpacity onPress={() => sendMessage()} style={{marginRight: 20}}>
+                            <Ionicons style={styles.iconsend} color={"black"} name="send-sharp" size={20}/>
+                        </TouchableOpacity>
+                    </View>
+                </KeyboardAvoidingView>
+                
         </SafeAreaView>
     );
 }
 
-function ReceiverMessage({content, time}){
+function ReceiverMessage({ message }){
     
     const [showTime, setShowTime] = useState(false);
+    const time = new Date(message.timestamp["seconds"]*1000);
+
     return (
         <View>
-            <Pressable style={styles.receiverBubble} onPress={() => setShowTime(!showTime)}>
-                <Text style={{color: COLORS.primary}}>{content}</Text>
+            <Pressable style={styles.receiverBubble} onPress={() => {setShowTime(true); setTimeout(() => {setShowTime(false)}, 2000)}}>
+                <Text style={{color: COLORS.primary}}>{message.message}</Text>
             </Pressable>
-            { (showTime) ? <Text style={styles.receiverTime}>{time}</Text> : null}
+            { (showTime) ? <TimeAgo dateTo={time} style={styles.receiverTime}/> : null}
             
         </View>
-        
     )
 }
 
-function SenderMessage({content, time}){
+function SenderMessage({ message }){
 
     const [showTime, setShowTime] = useState(false);
+    const time = new Date(message.timestamp != null ? message.timestamp["seconds"]*1000 : 0);
+
     return (
         <View>
-            <Pressable style={styles.senderBubble} onPress={() => setShowTime(!showTime)}>
-                <Text style={{color: "white"}}>{content}</Text>
+            <Pressable style={styles.senderBubble} onPress={() => {setShowTime(true); setTimeout(() => {setShowTime(false)}, 2000)}}>
+                <Text style={{color: "white"}}>{message.message}</Text>
             </Pressable>
-            { (showTime) ? <Text style={styles.senderTime}>{time}</Text> : null}
+            { (showTime) ? <TimeAgo dateTo={time ? time : 0} style={styles.senderTime}/> : null}
             
         </View>
         
