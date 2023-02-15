@@ -40,7 +40,37 @@ When two users like each other on the app, a match is triggered. They are now ab
 Users can chat in real time with the build in chat section of the app. The navigation through the differents part of the app is handled by [**React Navigation**](https://github.com/react-navigation/react-navigation) and the messages are stored on **Firebase Firestore**.
 <br/><br/>
 
-## Screenshots
+## Author
+- [@lorematteo](https://www.github.com/lorematteo)
+<br/><br/>
+
+## License
+Aftal is licensed under the [MIT](https://github.com/lorematteo/aftal-app/blob/master/LICENSE.md).
+```plaintext
+MIT License
+
+Copyright (c) 2023 Mattéo Lo Re
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## Store screenshots
 <div style="display:flex;" >
   <img  src="screenshots/storepic/1.jpeg" width="19%" >
   <img style="margin-left:10px;" src="screenshots/storepic/2.jpeg" width="19%" >
