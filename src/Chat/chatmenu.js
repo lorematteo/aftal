@@ -94,7 +94,7 @@ function ConversationRow({nav, matchDetails, userId}){
             <View style={{ justifyContent: "center", padding: 5, width: width*0.775}}>
                 <View style={{flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between"}}>
                     <Text style={{fontSize:16, fontWeight: "600", }}>{matchedUserInfo?.name}</Text>
-                    <TimeAgo dateTo={new Date(matchDetails.timestamp["seconds"]*1000)} style={{fontSize: 10, color: COLORS.gray, opacity: 0.7}}/>
+                    <TimeAgo dateTo={new Date(matchDetails?.timestamp["seconds"]*1000)} style={{fontSize: 10, color: COLORS.gray, opacity: 0.7}}/>
                 </View>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
                     <Text style={{fontSize: 13, color: COLORS.gray}}>{lastMessage!="" ? lastMessage > 35 ? lastMessage.substring(0, 35).trim()+" ..." : lastMessage : "Say hi !"}</Text>
