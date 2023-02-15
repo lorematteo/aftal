@@ -41,10 +41,6 @@ When two users like each other on the app, a match is triggered. They are now ab
 Users can chat in real time with the built-in chat section of the app. The navigation through the differents part of the app is handled by [**React Navigation**](https://github.com/react-navigation/react-navigation), and the messages are stored on **Firebase Firestore**.
 <br/><br/>
 
-## Author
-- [@lorematteo](https://www.github.com/lorematteo)
-<br/><br/>
-
 ## License
 Aftal is licenced under the [MIT](https://github.com/lorematteo/aftal-app/blob/master/LICENSE.md).
 ```plaintext
@@ -70,6 +66,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Author
+- [@lorematteo](https://www.github.com/lorematteo)
+<br/><br/>
 
 ## Store screenshots
 <div style="display:flex;" >
